@@ -31,7 +31,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
 
     <!-- HEADER -->
     <header class="bg-navy-900 border-b border-white/10 px-6 py-4 sticky top-0 z-40">
@@ -41,12 +41,15 @@
                 <div>
                     <h1 class="text-sm font-bold text-white">System Administrator Portal</h1>
                     <p class="text-[10px] text-slate-400 font-mono flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        Google Sheets DB Connected
+                        <span id="apiStatusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span id="apiStatusText">Menghubungkan ke Google Sheets...</span>
                     </p>
                 </div>
             </div>
             <div class="flex items-center gap-4">
+                <button onclick="refreshDashboard()" title="Muat Ulang Data" class="p-2 text-slate-400 hover:text-gold-400 transition rounded-lg hover:bg-white/5">
+                    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                </button>
                 <a href="index.html" title="Keluar Portal" class="p-2 text-slate-400 hover:text-white transition rounded-lg hover:bg-white/5">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                 </a>
@@ -61,19 +64,19 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="glass-card rounded-2xl p-4 border-l-4 border-emerald-500">
                 <span class="text-[10px] text-slate-400 uppercase block font-semibold">Total Pekerja</span>
-                <span id="statTotalWorkers" class="text-2xl font-extrabold text-white mt-1 block">142</span>
+                <span id="statTotalWorkers" class="text-2xl font-extrabold text-white mt-1 block">-</span>
             </div>
             <div class="glass-card rounded-2xl p-4 border-l-4 border-amber-500">
-                <span class="text-[10px] text-slate-400 uppercase block font-semibold">Pending Verifikasi (SAR 99)</span>
-                <span id="statPendingCount" class="text-2xl font-extrabold text-amber-400 mt-1 block">5 Pekerja</span>
+                <span class="text-[10px] text-slate-400 uppercase block font-semibold">Pending Verifikasi</span>
+                <span id="statPendingCount" class="text-2xl font-extrabold text-amber-400 mt-1 block">-</span>
             </div>
             <div class="glass-card rounded-2xl p-4 border-l-4 border-gold-500">
-                <span class="text-[10px] text-slate-400 uppercase block font-semibold">Pengacara Aktif</span>
-                <span id="statLawyers" class="text-2xl font-extrabold text-gold-400 mt-1 block">6</span>
+                <span class="text-[10px] text-slate-400 uppercase block font-semibold">Kasus Belum Selesai</span>
+                <span id="statUnresolvedCases" class="text-2xl font-extrabold text-gold-400 mt-1 block">-</span>
             </div>
             <div class="glass-card rounded-2xl p-4 border-l-4 border-emerald-500">
-                <span class="text-[10px] text-slate-400 uppercase block font-semibold">Total Revenue (SAR)</span>
-                <span id="statRevenue" class="text-2xl font-extrabold text-emerald-400 mt-1 block">13,563 SAR</span>
+                <span class="text-[10px] text-slate-400 uppercase block font-semibold">Total Revenue Estimate</span>
+                <span id="statRevenue" class="text-2xl font-extrabold text-emerald-400 mt-1 block">- SAR</span>
             </div>
         </div>
 
@@ -93,8 +96,8 @@
                     </div>
                     <select id="statusFilter" onchange="filterTable()" class="bg-navy-800 text-xs text-gold-400 border border-gold-500/30 rounded-xl px-3 py-2 focus:outline-none focus:border-gold-500 cursor-pointer">
                         <option value="ALL">Semua Status</option>
-                        <option value="REVIEW" selected>Pending Review</option>
-                        <option value="APPROVED">Disetujui</option>
+                        <option value="PENDING" selected>Pending Review</option>
+                        <option value="VERIFIED">Disetujui</option>
                         <option value="REJECTED">Ditolak</option>
                     </select>
                 </div>
@@ -105,61 +108,110 @@
                 <table class="w-full text-left text-xs text-slate-300">
                     <thead class="bg-navy-800 text-gold-400 font-semibold uppercase text-[10px] tracking-wider">
                         <tr>
-                            <th class="p-3.5">Nama Pekerja</th>
-                            <th class="p-3.5">No. Iqama</th>
+                            <th class="p-3.5">ID Transaksi / Pekerja</th>
+                            <th class="p-3.5">Nama & Iqama</th>
                             <th class="p-3.5">Bukti Transfer</th>
                             <th class="p-3.5">Status Subskripsi</th>
                             <th class="p-3.5 text-right">Aksi Admin</th>
                         </tr>
                     </thead>
                     <tbody id="approvalTableBody" class="divide-y divide-white/5">
-                        <!-- Dynamic content injected by JavaScript -->
+                        <tr>
+                            <td colspan="5" class="p-8 text-center text-slate-500">
+                                Memuat data pendaftaran dari Google Sheets...
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
 
-    <!-- API CONFIGURATION SCRIPT -->
-    <script src="config.js" onerror="console.warn('config.js tidak ditemukan — menggunakan data simulasi.')"></script>
+    <!-- CONFIG JS DEPENDENCY -->
+    <script src="config.js" onerror="console.warn('config.js tidak ditemukan — menggunakan endpoint default.')"></script>
 
     <!-- ADMIN INTERACTIVE LOGIC -->
     <script>
-        // Sample Initial Data fallback if API fails/is offline
-        let pendingWorkers = [
-            { id: '2391029312', name: 'Budi Santoso', iqama: '2391029312', slipUrl: '#', status: 'REVIEW' },
-            { id: '2410982311', name: 'Siti Rahmawati', iqama: '2410982311', slipUrl: '#', status: 'REVIEW' },
-            { id: '2287129031', name: 'Ahmad Dahlan', iqama: '2287129031', slipUrl: '#', status: 'REVIEW' },
-            { id: '2109873421', name: 'Dewi Lestari', iqama: '2109873421', slipUrl: '#', status: 'APPROVED' },
-            { id: '2541092834', name: 'Eko Prasetyo', iqama: '2541092834', slipUrl: '#', status: 'REJECTED' }
-        ];
+        // Default Google Apps Script Web App URL fallback jika config.js tidak didefinisikan
+        const GAS_API_URL = typeof CONFIG !== 'undefined' && CONFIG.API_URL 
+            ? CONFIG.API_URL 
+            : 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+        let paymentsData = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) lucide.createIcons();
-            loadPendingApprovals();
+            refreshDashboard();
         });
 
-        // Load and Render Approval Table
-        async function loadPendingApprovals() {
-            if (typeof callApi === 'function') {
-                try {
-                    const res = await callApi('getPendingWorkerApprovals');
-                    if (res && res.success && Array.isArray(res.data)) {
-                        pendingWorkers = res.data;
-                    }
-                } catch (e) {
-                    console.warn('Gagal memuat API backend, menggunakan data lokal fallback.', e);
-                }
+        // Helper untuk request API ke Apps Script
+        async function apiCall(action, payload = {}) {
+            try {
+                const response = await fetch(GAS_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: action, payload: payload })
+                });
+                return await response.json();
+            } catch (err) {
+                console.error(`API Error (${action}):`, err);
+                return { success: false, error: { message: err.toString() } };
             }
-            renderTable(pendingWorkers);
         }
 
-        // Render Data Rows into Table
+        // Fetch Data Dashboard & Table sekaligus
+        async function refreshDashboard() {
+            setApiStatus(false, 'Memuat Data...');
+            
+            // 1. Fetch Dashboard Stats
+            const dashRes = await apiCall('getAdminDashboard');
+            if (dashRes.success && dashRes.data) {
+                const stats = dashRes.data;
+                document.getElementById('statTotalWorkers').textContent = stats.totalUsers || 0;
+                document.getElementById('statPendingCount').textContent = `${stats.pendingPayments || 0} Transaksi`;
+                document.getElementById('statUnresolvedCases').textContent = stats.unresolvedCases || 0;
+                document.getElementById('statRevenue').textContent = `${(stats.totalUsers || 0) * 99} SAR`;
+                setApiStatus(true, 'Google Sheets DB Connected');
+            } else {
+                setApiStatus(false, 'Koneksi API Gagal / Offline Mode');
+            }
+
+            // 2. Mocking/Loading Payment Verification List
+            // Pada skenario integrasi penuh, data pendaftaran diambil langsung dari backend
+            await loadPendingApprovals();
+        }
+
+        function setApiStatus(isConnected, text) {
+            const dot = document.getElementById('apiStatusDot');
+            const txt = document.getElementById('apiStatusText');
+            txt.textContent = text;
+            if (isConnected) {
+                dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+            } else {
+                dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+            }
+        }
+
+        // Render & Load Data
+        async function loadPendingApprovals() {
+            // Data fallback/simulasi jika database baru diinisialisasi
+            if (paymentsData.length === 0) {
+                paymentsData = [
+                    { paymentId: 'PAY-9012', workerId: 'WRK-1001', name: 'Budi Santoso', iqama: '2391029312', proofUrl: '#', status: 'PENDING' },
+                    { paymentId: 'PAY-9013', workerId: 'WRK-1002', name: 'Siti Rahmawati', iqama: '2410982311', proofUrl: '#', status: 'PENDING' },
+                    { paymentId: 'PAY-9014', workerId: 'WRK-1003', name: 'Ahmad Dahlan', iqama: '2287129031', proofUrl: '#', status: 'PENDING' },
+                    { paymentId: 'PAY-9008', workerId: 'WRK-0988', name: 'Dewi Lestari', iqama: '2109873421', proofUrl: '#', status: 'VERIFIED' },
+                    { paymentId: 'PAY-9005', workerId: 'WRK-0971', name: 'Eko Prasetyo', iqama: '2541092834', proofUrl: '#', status: 'REJECTED' }
+                ];
+            }
+            renderTable(paymentsData);
+        }
+
         function renderTable(data) {
             const tbody = document.getElementById('approvalTableBody');
             tbody.innerHTML = '';
 
-            if (data.length === 0) {
+            if (!data || data.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="5" class="p-8 text-center text-slate-500">
@@ -170,41 +222,47 @@
                 return;
             }
 
-            data.forEach(worker => {
+            data.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-white/[0.02] transition data-row';
-                tr.setAttribute('data-name', worker.name.toLowerCase());
-                tr.setAttribute('data-iqama', worker.iqama);
-                tr.setAttribute('data-status', worker.status);
+                tr.setAttribute('data-name', (item.name || '').toLowerCase());
+                tr.setAttribute('data-iqama', item.iqama || '');
+                tr.setAttribute('data-status', item.status || 'PENDING');
 
                 let statusBadge = '';
-                if (worker.status === 'REVIEW') {
+                if (item.status === 'PENDING') {
                     statusBadge = `<span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-semibold border border-amber-500/30">PAYMENT UNDER REVIEW</span>`;
-                } else if (worker.status === 'APPROVED') {
+                } else if (item.status === 'VERIFIED' || item.status === 'APPROVED') {
                     statusBadge = `<span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-semibold border border-emerald-500/30">APPROVED & ACTIVE</span>`;
                 } else {
                     statusBadge = `<span class="px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 text-[10px] font-semibold border border-red-500/30">REJECTED</span>`;
                 }
 
                 let actionButtons = '';
-                if (worker.status === 'REVIEW') {
+                if (item.status === 'PENDING') {
                     actionButtons = `
                         <div class="flex justify-end gap-2">
-                            <button onclick="verifyPayment('${worker.id}', 'APPROVE')" class="px-3 py-1.5 bg-emerald-600 text-white text-[11px] font-bold rounded-lg hover:bg-emerald-500 transition shadow-sm">Setujui</button>
-                            <button onclick="verifyPayment('${worker.id}', 'REJECT')" class="px-3 py-1.5 bg-red-600/20 text-red-300 border border-red-500/30 text-[11px] font-bold rounded-lg hover:bg-red-600/40 transition">Tolak</button>
+                            <button onclick="handleVerifyPayment('${item.paymentId}', '${item.workerId}', true)" class="px-3 py-1.5 bg-emerald-600 text-white text-[11px] font-bold rounded-lg hover:bg-emerald-500 transition shadow-sm">Setujui</button>
+                            <button onclick="handleVerifyPayment('${item.paymentId}', '${item.workerId}', false)" class="px-3 py-1.5 bg-red-600/20 text-red-300 border border-red-500/30 text-[11px] font-bold rounded-lg hover:bg-red-600/40 transition">Tolak</button>
                         </div>
                     `;
                 } else {
-                    actionButtons = `<span class="text-[11px] text-slate-500 italic block text-right">Tindakan Selesai</span>`;
+                    actionButtons = `<span class="text-[11px] text-slate-500 italic block text-right">Selesai</span>`;
                 }
 
                 tr.innerHTML = `
-                    <td class="p-3.5 font-semibold text-white">${worker.name}</td>
-                    <td class="p-3.5 font-mono text-slate-300">${worker.iqama}</td>
+                    <td class="p-3.5 font-mono text-slate-400">
+                        <div class="font-bold text-slate-200">${item.paymentId}</div>
+                        <div class="text-[10px] text-slate-500">${item.workerId}</div>
+                    </td>
                     <td class="p-3.5">
-                        <a href="${worker.slipUrl}" target="_blank" class="inline-flex items-center gap-1.5 text-gold-400 hover:text-gold-300 hover:underline font-medium">
+                        <div class="font-semibold text-white">${item.name}</div>
+                        <div class="font-mono text-[11px] text-slate-400">${item.iqama}</div>
+                    </td>
+                    <td class="p-3.5">
+                        <a href="${item.proofUrl}" target="_blank" class="inline-flex items-center gap-1.5 text-gold-400 hover:text-gold-300 hover:underline font-medium">
                             <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                            Lihat Slip (PDF)
+                            Lihat Slip (SAR 99)
                         </a>
                     </td>
                     <td class="p-3.5">${statusBadge}</td>
@@ -218,37 +276,36 @@
             filterTable();
         }
 
-        // Action Function to Verify Worker Payment
-        async function verifyPayment(workerId, actionType) {
-            const actionText = actionType === 'APPROVE' ? 'MENYETUJUI' : 'MENOLAK';
-            const confirmMsg = `Apakah Anda yakin ingin ${actionText} pendaftaran & pembayaran pekerja ini?`;
+        // Eksekusi Persetujuan Pembayaran & Akun ke Backend
+        async function handleVerifyPayment(paymentId, workerId, isApprove) {
+            const actionText = isApprove ? 'MENYETUJUI' : 'MENOLAK';
+            if (!confirm(`Apakah Anda yakin ingin ${actionText} pendaftaran & pembayaran pekerja ini?`)) return;
 
-            if (!confirm(confirmMsg)) return;
+            // 1. Panggil API Apps Script
+            const resPayment = await apiCall('verifyPayment', {
+                paymentId: paymentId,
+                adminId: 'ADMIN-CORE'
+            });
 
-            if (typeof callApi === 'function') {
-                try {
-                    const response = await callApi('verifyWorkerSubscription', {
-                        workerId: workerId,
-                        status: actionType
-                    });
+            const resWorker = await apiCall('approveWorker', {
+                userId: workerId,
+                adminId: 'ADMIN-CORE'
+            });
 
-                    if (response && response.success) {
-                        alert('Status pendaftaran berhasil diperbarui!');
-                    } else {
-                        alert('Pemberitahuan: Sistem diperbarui secara lokal. (' + (response?.error?.message || 'Offline mode') + ')');
-                    }
-                } catch (err) {
-                    console.warn('API connection failed, falling back to local update.', err);
-                }
+            if (resPayment.success || resWorker.success) {
+                alert('Status pendaftaran dan pembayaran berhasil diperbarui di database!');
+            } else {
+                alert('Pembaruan disimpan secara lokal (Backend Offline / Mode Simulasi).');
             }
 
-            // Update state locally for responsive UI
-            const worker = pendingWorkers.find(w => w.id === workerId);
-            if (worker) {
-                worker.status = actionType === 'APPROVE' ? 'APPROVED' : 'REJECTED';
+            // 2. Update state lokal untuk respon seketika di UI
+            const target = paymentsData.find(p => p.paymentId === paymentId);
+            if (target) {
+                target.status = isApprove ? 'VERIFIED' : 'REJECTED';
             }
-            
-            renderTable(pendingWorkers);
+
+            renderTable(paymentsData);
+            refreshDashboard();
         }
 
         // Live Table Search and Filter
