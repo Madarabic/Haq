@@ -79,7 +79,6 @@
             const identifier = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
-            // Memanggil API loginUser di Code.gs lewat config.js
             const res = await callApi('loginUser', { 
                 identifier: identifier,
                 email: identifier, 
@@ -87,6 +86,9 @@
             });
 
             if (res.success) {
+                // Simpan profil hasil login nyata ke localStorage
+                localStorage.setItem('currentUser', JSON.stringify(res.data));
+
                 const role = (res.data.role || '').toUpperCase();
                 if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
                     window.location.href = 'admin.html';
@@ -101,9 +103,38 @@
         }
 
         function demoLogin(role) {
-            if (role === 'worker') window.location.href = 'worker.html';
-            if (role === 'lawyer') window.location.href = 'lawyer.html';
-            if (role === 'admin') window.location.href = 'admin.html';
+            let demoUser = {};
+
+            if (role === 'worker') {
+                demoUser = {
+                    userId: 'USR-0178ac46',
+                    fullName: 'Muhamad',
+                    email: '966512535123@haqsaudi.internal',
+                    role: 'WORKER'
+                };
+                localStorage.setItem('currentUser', JSON.stringify(demoUser));
+                window.location.href = 'worker.html';
+            } 
+            else if (role === 'lawyer') {
+                demoUser = {
+                    userId: 'LWY-001',
+                    fullName: 'Sulaiman Al-Ghamdi',
+                    email: 'sulaiman@law-firm.sa',
+                    role: 'LAWYER'
+                };
+                localStorage.setItem('currentUser', JSON.stringify(demoUser));
+                window.location.href = 'lawyer.html';
+            } 
+            else if (role === 'admin') {
+                demoUser = {
+                    userId: 'ADM-001',
+                    fullName: 'Admin System',
+                    email: 'admin@haqsaudi.com',
+                    role: 'ADMIN'
+                };
+                localStorage.setItem('currentUser', JSON.stringify(demoUser));
+                window.location.href = 'admin.html';
+            }
         }
     </script>
 </body>
