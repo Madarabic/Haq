@@ -37,26 +37,26 @@
         </div>
 
         <div class="glass-card rounded-3xl p-8 shadow-2xl relative">
-            <form id="regForm" class="space-y-6">
+            <form id="regForm" onsubmit="handleRegistration(event)" class="space-y-6">
                 <!-- STEP 1: Personal Info -->
                 <div>
                     <h3 class="text-sm font-bold text-gold-400 uppercase tracking-wider mb-4 border-b border-white/10 pb-2">1. Data Pribadi Pekerja</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                         <div>
                             <label class="block mb-1 font-semibold">Nama Lengkap (Sesuai Paspor/Iqama)</label>
-                            <input type="text" required placeholder="Ahmad Subagyo" class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
+                            <input type="text" id="fullName" required placeholder="Ahmad Subagyo" class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
                         </div>
                         <div>
                             <label class="block mb-1 font-semibold">Nomor Iqama (10 Digit)</label>
-                            <input type="text" maxlength="10" required placeholder="2xxxxxxxx" class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
+                            <input type="text" id="iqamaNo" maxlength="10" pattern="[0-9]{10}" required placeholder="2xxxxxxxx" class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
                         </div>
                         <div>
                             <label class="block mb-1 font-semibold">Nomor WhatsApp Aktif</label>
-                            <input type="text" required placeholder="+966 5x xxx xxxx" class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
+                            <input type="tel" id="phone" required placeholder="+966 5x xxx xxxx" class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
                         </div>
                         <div>
                             <label class="block mb-1 font-semibold">Kota Tempat Bekerja di Saudi</label>
-                            <input type="text" required placeholder="Riyadh / Jeddah / Madinah" class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
+                            <input type="text" id="city" required placeholder="Riyadh / Jeddah / Madinah" class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
                         </div>
                     </div>
                 </div>
@@ -67,19 +67,19 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                         <div>
                             <label class="block mb-1 font-semibold">Nama Perusahaan / Majikan (Kafil)</label>
-                            <input type="text" required class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
+                            <input type="text" id="company" required placeholder="PT / Company / Kafil Name" class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
                         </div>
                         <div>
                             <label class="block mb-1 font-semibold">Gaji Pokok Bulanan (SAR)</label>
-                            <input type="number" required placeholder="3000" class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
+                            <input type="number" id="salary" required placeholder="3000" class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
                         </div>
                         <div>
                             <label class="block mb-1 font-semibold">Tanggal Mulai Kerja</label>
-                            <input type="date" required class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none text-slate-300">
+                            <input type="date" id="startDate" required class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none text-slate-300">
                         </div>
                         <div>
                             <label class="block mb-1 font-semibold">Apakah punya Kontrak Qiwa?</label>
-                            <select class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
+                            <select id="hasQiwa" class="w-full px-4 py-3 rounded-xl bg-navy-800 border border-white/10 focus:border-gold-500 outline-none">
                                 <option value="YES">Ya, Punya Kontrak Qiwa Mutsabbal</option>
                                 <option value="NO">Tidak / Belum Ada</option>
                             </select>
@@ -93,11 +93,11 @@
                     <div class="space-y-3 text-xs">
                         <div>
                             <label class="block mb-1 font-semibold">Foto / Scan Iqama (PDF/JPG)</label>
-                            <input type="file" required class="w-full text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-gold-500 file:text-navy-900 hover:file:bg-gold-400">
+                            <input type="file" id="fileIqama" accept="image/*,application/pdf" required class="w-full text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-gold-500 file:text-navy-900 hover:file:bg-gold-400">
                         </div>
                         <div>
                             <label class="block mb-1 font-semibold">Foto / File Kontrak Kerja (Jika Ada)</label>
-                            <input type="file" class="w-full text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-slate-200">
+                            <input type="file" id="fileContract" accept="image/*,application/pdf" class="w-full text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-slate-200">
                         </div>
                     </div>
                 </div>
@@ -106,48 +106,89 @@
                     Setiap data yang Anda unggah dilindungi dengan enkripsi ketat dan hanya dapat diakses oleh tim pengacara berlisensi resmi yang ditunjuk.
                 </div>
 
-                <button type="button" onclick="submitRegistration()" class="w-full py-4 bg-gradient-to-r from-gold-500 to-amber-600 text-navy-900 font-bold rounded-xl shadow-lg hover:brightness-110 transition text-xs">
+                <button type="submit" id="btnSubmit" class="w-full py-4 bg-gradient-to-r from-gold-500 to-amber-600 text-navy-900 font-bold rounded-xl shadow-lg hover:brightness-110 transition text-xs">
                     Kirim Pendaftaran & Lanjutkan Pembayaran SAR 99
                 </button>
             </form>
         </div>
     </div>
 
-    <script>
-        function submitRegistration() {
-            alert('Pendaftaran berhasil disimpan. Anda akan diarahkan ke Dashboard Worker untuk mengunggah bukti transfer membership SAR 99.');
-            window.location.href = 'worker.html';
-        }
-    </script>
-<!-- Script Konfigurasi & Interaktif -->
+    <!-- Script Konfigurasi & Backend -->
     <script src="config.js"></script>
     <script>
-        lucide.createIcons();
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
 
-        async function submitRegistration() {
-            const form = document.getElementById('regForm');
-            const formData = {
-                fullName: form.querySelector('input[placeholder="Ahmad Subagyo"]').value,
-                iqamaNo: form.querySelector('input[placeholder="2xxxxxxxx"]').value,
-                phone: form.querySelector('input[placeholder="+966 5x xxx xxxx"]').value,
-                city: form.querySelector('input[placeholder="Riyadh / Jeddah / Madinah"]').value,
-                company: form.querySelectorAll('input')[3].value,
-                salary: form.querySelector('input[type="number"]').value,
-                startDate: form.querySelector('input[type="date"]').value,
-                hasQiwa: form.querySelector('select').value
-            };
+        // Helper untuk Konversi File ke Base64 (Untuk dikirim ke Apps Script / Backend)
+        const fileToBase64 = file => new Promise((resolve, reject) => {
+            if (!file) return resolve(null);
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve({
+                name: file.name,
+                type: file.type,
+                base64: reader.result.split(',')[1]
+            });
+            reader.onerror = error => reject(error);
+        });
 
-            const res = await callApi('registerWorker', formData);
+        async function handleRegistration(event) {
+            event.preventDefault();
+            
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-pulse">Memproses & Mengunggah Data...</span>';
 
-            if (res.success) {
-                alert('Pendaftaran berhasil disimpan ke Google Sheets!');
-                window.location.href = 'worker.html';
-            } else {
-                alert('Gagal mendaftar: ' + (res.error?.message || 'Terjadi kesalahan sistem'));
+            try {
+                // Read File Uploads
+                const iqamaFileElem = document.getElementById('fileIqama').files[0];
+                const contractFileElem = document.getElementById('fileContract').files[0];
+
+                const iqamaFileData = await fileToBase64(iqamaFileElem);
+                const contractFileData = await fileToBase64(contractFileElem);
+
+                const payload = {
+                    role: 'WORKER',
+                    fullName: document.getElementById('fullName').value.trim(),
+                    iqamaNo: document.getElementById('iqamaNo').value.trim(),
+                    phone: document.getElementById('phone').value.trim(),
+                    city: document.getElementById('city').value.trim(),
+                    company: document.getElementById('company').value.trim(),
+                    salary: document.getElementById('salary').value,
+                    startDate: document.getElementById('startDate').value,
+                    hasQiwa: document.getElementById('hasQiwa').value,
+                    iqamaFile: iqamaFileData,
+                    contractFile: contractFileData
+                };
+
+                // Panggil Backend API
+                const res = await callApi('registerWorker', payload);
+
+                if (res && res.success) {
+                    // Simpan User Session
+                    const sessionData = {
+                        userId: payload.iqamaNo,
+                        fullName: payload.fullName,
+                        iqamaNumber: payload.iqamaNo,
+                        role: 'WORKER',
+                        phone: payload.phone
+                    };
+                    localStorage.setItem('currentUser', JSON.stringify(sessionData));
+
+                    alert('Pendaftaran berhasil disimpan! Anda akan diarahkan ke Dashboard Worker.');
+                    window.location.href = 'worker.html';
+                } else {
+                    alert('Gagal mendaftar: ' + (res?.error?.message || 'Terjadi kesalahan pada server.'));
+                }
+            } catch (err) {
+                console.error('Registration Error:', err);
+                alert('Terjadi kesalahan koneksi atau pemrosesan berkas.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Kirim Pendaftaran & Lanjutkan Pembayaran SAR 99';
             }
         }
     </script>
-</body>
-</html>
 </body>
 </html>
