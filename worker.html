@@ -51,7 +51,7 @@
             <div class="glass-card rounded-2xl p-4 border-l-4 border-emerald-500">
                 <span class="text-[10px] text-slate-400 uppercase block font-semibold">Status Iqama</span>
                 <span class="text-sm font-bold text-white mt-1 block" id="cardIqamaStatus">Aktif</span>
-                <span class="text-[9px] text-emerald-400 mt-1 block" id="cardIqamaExp">Exp: -</span>
+                <span class="text-[9px] text-emerald-400 mt-1 block" id="cardIqamaExp">Exp: Terverifikasi</span>
             </div>
             <div class="glass-card rounded-2xl p-4 border-l-4 border-gold-500">
                 <span class="text-[10px] text-slate-400 uppercase block font-semibold">Kontrak Kerja</span>
@@ -60,13 +60,13 @@
             </div>
             <div class="glass-card rounded-2xl p-4 border-l-4 border-emerald-500">
                 <span class="text-[10px] text-slate-400 uppercase block font-semibold">Sisa Cuti Tahunan</span>
-                <span class="text-sm font-bold text-white mt-1 block" id="cardLeaveBalance">- Hari</span>
+                <span class="text-sm font-bold text-white mt-1 block" id="cardLeaveBalance">21 Hari</span>
                 <span class="text-[9px] text-slate-400 mt-1 block">Tahun berjalan</span>
             </div>
             <div class="glass-card rounded-2xl p-4 border-l-4 border-amber-500">
                 <span class="text-[10px] text-slate-400 uppercase block font-semibold">Keanggotaan</span>
                 <span class="text-sm font-bold text-amber-400 mt-1 block" id="cardMembership">ACTIVE</span>
-                <span class="text-[9px] text-slate-400 mt-1 block" id="cardMemberExp">Exp: -</span>
+                <span class="text-[9px] text-slate-400 mt-1 block" id="cardMemberExp">Exp: Aktif</span>
             </div>
         </div>
 
@@ -160,13 +160,14 @@
             }
 
             const user = JSON.parse(userRaw);
+            const userId = user.userId || user.email || user.iqamaNumber || user.iqama;
 
             // Render Header Profil
             document.getElementById('headerUserName').textContent = user.fullName || user.name || 'Pengguna';
             document.getElementById('headerIqama').textContent = user.iqamaNumber || user.iqama || user.userId || '-';
 
             // Muat Kasus Real milik User
-            loadUserCases(user.userId || user.email);
+            loadUserCases(userId);
         }
 
         // 2. Ambil Kasus Real milik User dari Backend
@@ -176,32 +177,37 @@
                 const res = await callApi('getUserCases', { userId: userId });
                 
                 if (res && res.success && res.data && res.data.length > 0) {
-                    container.innerHTML = res.data.map(c => `
-                        <div class="glass-card rounded-2xl p-6 relative">
-                            <div class="flex justify-between items-start mb-3">
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                                    c.status === 'ANSWERED' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                                }">
-                                    ${c.status === 'ANSWERED' ? 'JAWABAN TERSEDIA' : 'MEMPEROLEH PROSES'}
-                                </span>
-                                <span class="text-[10px] font-mono text-slate-400">${c.caseId || 'CASE-ID'} • ${c.createdAt || ''}</span>
-                            </div>
-                            <h3 class="font-bold text-white text-sm mb-2">${c.title}</h3>
-                            <p class="text-xs text-slate-300 line-clamp-2 mb-4">${c.details}</p>
-                            
-                            ${c.lawyerAnswer ? `
-                                <div class="p-4 rounded-xl bg-navy-800/80 border border-gold-500/30 text-xs space-y-2">
-                                    <div class="flex items-center justify-between text-[10px] text-gold-400 font-semibold border-b border-white/5 pb-2">
-                                        <span>Ditinjau oleh: ${c.lawyerName || 'Tim Legal HAQ'}</span>
-                                        <span>Disetujui</span>
-                                    </div>
-                                    <p class="text-slate-200 leading-relaxed pt-1">
-                                        <strong>Jawaban Hukum:</strong> ${c.lawyerAnswer}
-                                    </p>
+                    container.innerHTML = res.data.map(c => {
+                        const isAnswered = c.status === 'ANSWERED' || !!c.lawyerAnswer || !!c.answer;
+                        const answerText = c.lawyerAnswer || c.answer || '';
+
+                        return `
+                            <div class="glass-card rounded-2xl p-6 relative">
+                                <div class="flex justify-between items-start mb-3">
+                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                                        isAnswered ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                    }">
+                                        ${isAnswered ? 'JAWABAN TERSEDIA' : 'MENUNGGU BALASAN LAWYER'}
+                                    </span>
+                                    <span class="text-[10px] font-mono text-slate-400">${c.caseId || c.id || 'CASE-ID'} • ${c.createdAt || ''}</span>
                                 </div>
-                            ` : ''}
-                        </div>
-                    `).join('');
+                                <h3 class="font-bold text-white text-sm mb-2">${c.title || c.category || 'Konsultasi Hukum'}</h3>
+                                <p class="text-xs text-slate-300 line-clamp-3 mb-4">${c.details || c.question || ''}</p>
+                                
+                                ${answerText ? `
+                                    <div class="p-4 rounded-xl bg-navy-800/80 border border-gold-500/30 text-xs space-y-2">
+                                        <div class="flex items-center justify-between text-[10px] text-gold-400 font-semibold border-b border-white/5 pb-2">
+                                            <span>Ditinjau oleh: ${c.lawyerName || 'Tim Legal HAQ'}</span>
+                                            <span>Disetujui</span>
+                                        </div>
+                                        <p class="text-slate-200 leading-relaxed pt-1">
+                                            <strong>Jawaban Hukum:</strong> ${answerText}
+                                        </p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('');
                 } else {
                     container.innerHTML = `
                         <div class="glass-card rounded-2xl p-8 text-center text-slate-400 text-xs">
@@ -210,7 +216,8 @@
                     `;
                 }
             } catch (err) {
-                container.innerHTML = `<p class="text-xs text-red-400">Gagal memuat konsultasi.</p>`;
+                console.error("Gagal mengambil kasus:", err);
+                container.innerHTML = `<p class="text-xs text-red-400">Gagal memuat konsultasi. Pastikan koneksi internet stabil.</p>`;
             }
         }
 
@@ -224,29 +231,36 @@
 
             const userRaw = localStorage.getItem('currentUser');
             const user = userRaw ? JSON.parse(userRaw) : {};
+            const userId = user.userId || user.email || user.iqamaNumber || user.iqama;
 
             btn.disabled = true;
             btn.innerText = 'Mengirim...';
 
-            const res = await callApi('submitCase', { 
-                userId: user.userId || user.email,
-                userName: user.fullName || user.name,
-                category, 
-                title, 
-                details 
-            });
+            try {
+                const res = await callApi('submitCase', { 
+                    userId: userId,
+                    userName: user.fullName || user.name || 'Pekerja',
+                    iqama: user.iqamaNumber || user.iqama || '-',
+                    category: category, 
+                    title: title, 
+                    details: details 
+                });
 
-            if (res && res.success) {
-                alert('Pertanyaan Hukum berhasil dikirim!');
-                closeModal('newCaseModal');
-                document.getElementById('caseForm').reset();
-                loadUserCases(user.userId || user.email);
-            } else {
-                alert('Gagal mengirim: ' + (res?.error?.message || 'Kesalahan sistem'));
+                if (res && (res.success || res.status === 'success')) {
+                    alert('Pertanyaan Hukum berhasil dikirim ke Pengacara!');
+                    closeModal('newCaseModal');
+                    document.getElementById('caseForm').reset();
+                    loadUserCases(userId);
+                } else {
+                    alert('Gagal mengirim: ' + (res?.error?.message || 'Kesalahan sistem'));
+                }
+            } catch (err) {
+                console.error("Error submit case:", err);
+                alert('Gagal mengirim pertanyaan. Silakan periksa jaringan Anda.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Kirim ke Tim Pengacara';
             }
-
-            btn.disabled = false;
-            btn.innerText = 'Kirim ke Tim Pengacara';
         }
 
         // 4. Logout Real
