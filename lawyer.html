@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAQ SAUDI — Portal Lawyer / لوحة المحامي</title>
+    <title>HAQ SAUDI — Portal Pengacara / لوحة المحامي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -23,161 +23,294 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         .glass-card { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.2); border-radius: 10px; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-12">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
 
-    <!-- TOP HEADER -->
+    <!-- LOGIN OVERLAY / MODAL (JIKA BELUM LOGIN HASIL DARI LOGIN.HTML) -->
+    <div id="authGuardOverlay" class="fixed inset-0 z-50 bg-navy-900/95 backdrop-blur-xl flex items-center justify-center p-4 hidden">
+        <div class="glass-card max-w-md w-full p-8 rounded-3xl text-center shadow-2xl border border-gold-500/20">
+            <div class="w-16 h-16 bg-gold-500/10 text-gold-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-gold-500/30">
+                <i data-lucide="shield-alert" class="w-8 h-8"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-2">Akses Terbatas</h2>
+            <p class="text-xs text-slate-400 leading-relaxed mb-6">Sesi pengacara tidak ditemukan. Silakan masuk terlebih dahulu menggunakan akun Pengacara / Legal Counsel.</p>
+            <button onclick="redirectToLogin()" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-navy-900 font-bold rounded-xl text-xs hover:brightness-110 transition shadow-lg shadow-gold-500/20">
+                Lanjut ke Halaman Login
+            </button>
+        </div>
+    </div>
+
+    <!-- HEADER PORTAL -->
     <header class="bg-navy-900 border-b border-white/10 px-6 py-4 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-gold-500 text-navy-900 font-bold flex items-center justify-center text-lg">م</div>
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-gold-500 to-amber-600 text-navy-900 font-extrabold flex items-center justify-center text-xl shadow-lg shadow-gold-500/20">
+                    مح
+                </div>
                 <div>
-                    <h1 class="text-sm font-bold text-white">Ruang Kerja Pengacara / Lawyer Workspace</h1>
-                    <p class="text-[10px] text-emerald-400 font-mono">Tim Legal HAQ SAUDI • Verified</p>
+                    <h1 class="text-sm font-bold text-white flex items-center gap-2">
+                        <span id="lawyerNameDisplay">Adv. Tim Hukum HAQ</span>
+                        <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[9px] px-2 py-0.5 rounded-full font-mono">VERIFIED COUNSEL</span>
+                    </h1>
+                    <p class="text-[10px] text-slate-400">Panel Konsultasi & Peninjauan Berkas Kasus</p>
                 </div>
             </div>
-            <button onclick="loadPendingCases()" class="px-3 py-1.5 bg-navy-800 border border-white/10 hover:border-gold-500/50 text-xs rounded-xl transition flex items-center gap-2 text-slate-300">
-                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh Data
-            </button>
+
+            <div class="flex items-center gap-3">
+                <button onclick="loadDashboardData()" title="Segarkan Data" class="p-2.5 bg-navy-800 border border-white/10 hover:border-gold-500/50 text-slate-300 hover:text-white rounded-xl transition">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+                <button onclick="handleLogout()" title="Keluar Akun" class="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
+                </button>
+            </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 pt-8">
-        <!-- HEADER STATS -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="glass-card rounded-2xl p-4 border-l-4 border-amber-500">
-                <span class="text-[10px] text-slate-400 uppercase block font-semibold">Kasus Menunggu Jawaban</span>
-                <span class="text-2xl font-bold text-amber-400 mt-1 block" id="statPendingCount">0</span>
+    <!-- DASHBOARD CONTENT -->
+    <main class="max-w-7xl mx-auto px-6 py-6 flex-1 w-full space-y-6">
+
+        <!-- RINGKASAN STATISTIK -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="glass-card p-5 rounded-2xl border-l-4 border-amber-500 flex justify-between items-center">
+                <div>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Perlu Jawaban</span>
+                    <h3 class="text-2xl font-bold text-amber-400 mt-1" id="statPending">0</h3>
+                </div>
+                <div class="p-3 bg-amber-500/10 rounded-xl text-amber-400"><i data-lucide="clock" class="w-6 h-6"></i></div>
             </div>
-            <div class="glass-card rounded-2xl p-4 border-l-4 border-emerald-500">
-                <span class="text-[10px] text-slate-400 uppercase block font-semibold">Kasus Terjawab</span>
-                <span class="text-2xl font-bold text-emerald-400 mt-1 block" id="statAnsweredCount">0</span>
+            <div class="glass-card p-5 rounded-2xl border-l-4 border-emerald-500 flex justify-between items-center">
+                <div>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Telah Disetujui</span>
+                    <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="statAnswered">0</h3>
+                </div>
+                <div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-400"><i data-lucide="check-circle-2" class="w-6 h-6"></i></div>
             </div>
-            <div class="glass-card rounded-2xl p-4 border-l-4 border-gold-500">
-                <span class="text-[10px] text-slate-400 uppercase block font-semibold">Total Konsultasi</span>
-                <span class="text-2xl font-bold text-white mt-1 block" id="statTotalCount">0</span>
+            <div class="glass-card p-5 rounded-2xl border-l-4 border-gold-500 flex justify-between items-center">
+                <div>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Konsultasi</span>
+                    <h3 class="text-2xl font-bold text-white mt-1" id="statTotal">0</h3>
+                </div>
+                <div class="p-3 bg-gold-500/10 rounded-xl text-gold-400"><i data-lucide="folder" class="w-6 h-6"></i></div>
             </div>
         </div>
 
-        <!-- MAIN CONTENT AREA -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- LIST KASUS DARI PEKERJA (LEFT 1 COL) -->
-            <div class="space-y-4">
-                <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                    <i data-lucide="inbox" class="w-4 h-4 text-gold-400"></i> Masuk Dari Pekerja
-                </h2>
-                <div id="casesList" class="space-y-3">
-                    <p class="text-xs text-slate-500 italic">Memuat daftar pertanyaan...</p>
+        <!-- UTAMA: DAFTAR KASUS & WORKSPACE PENINJAUAN -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- KOLOM KIRI: DAFTAR PEKERJA & KASUS (4 COLS) -->
+            <div class="lg:col-span-4 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="inbox" class="w-4 h-4 text-gold-400"></i> Masuk dari Pekerja
+                    </h2>
+                    <span class="text-[10px] text-slate-500 font-mono" id="lastUpdated">-</span>
+                </div>
+
+                <!-- LIST KASUS CONTAINER -->
+                <div id="casesList" class="space-y-3 max-h-[calc(100vh-280px)] overflow-y-auto custom-scrollbar pr-1">
+                    <div class="glass-card rounded-2xl p-6 text-center text-xs text-slate-400 italic">
+                        Memuat data konsultasi...
+                    </div>
                 </div>
             </div>
 
-            <!-- DETAIL & FORM RESPONSE (RIGHT 2 COLS) -->
-            <div class="lg:col-span-2">
-                <div id="caseDetailCard" class="glass-card rounded-3xl p-6 relative border border-white/10 hidden">
-                    <div class="flex justify-between items-start mb-4 pb-4 border-b border-white/10">
+            <!-- KOLOM KANAN: DETAIL KASUS, BERKAS PEKERJA, & FORM JAWABAN (8 COLS) -->
+            <div class="lg:col-span-8">
+                <!-- PANEL DETAIL KASUS -->
+                <div id="caseDetailCard" class="glass-card rounded-3xl p-6 relative border border-white/10 hidden space-y-6">
+                    
+                    <!-- HEADER DETAIL -->
+                    <div class="flex justify-between items-start pb-4 border-b border-white/10">
                         <div>
                             <span id="detailCategory" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gold-500/20 text-gold-400 border border-gold-500/30">
                                 Kategori
                             </span>
                             <h2 id="detailTitle" class="text-lg font-bold text-white mt-2">Judul Pertanyaan</h2>
-                            <p class="text-[11px] text-slate-400 font-mono mt-1">ID Kasus: <span id="detailCaseId" class="text-slate-200">-</span> • ID Worker: <span id="detailWorkerId" class="text-slate-200">-</span></p>
+                            <p class="text-[11px] text-slate-400 font-mono mt-1">ID Kasus: <span id="detailCaseId" class="text-gold-400 font-bold">-</span></p>
                         </div>
                         <span id="detailStatus" class="px-3 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400">SUBMITTED</span>
                     </div>
 
-                    <!-- KRONOLOGI PEKERJA -->
-                    <div class="bg-navy-900/90 p-4 rounded-2xl border border-white/5 mb-6">
-                        <h4 class="text-xs font-bold text-gold-400 mb-2 flex items-center gap-1.5">
-                            <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Rincian Kronologi Pekerja:
+                    <!-- RINGKASAN PROFIL & BERKAS PEKERJA -->
+                    <div class="bg-navy-900/80 p-4 rounded-2xl border border-white/10 space-y-3">
+                        <h4 class="text-xs font-bold text-slate-300 flex items-center justify-between">
+                            <span class="flex items-center gap-2"><i data-lucide="user-check" class="w-4 h-4 text-emerald-400"></i> Informasi & Berkas Pekerja</span>
+                            <span class="text-[10px] text-emerald-400 font-mono">STATUS: DOKUMEN LENGKAP</span>
                         </h4>
-                        <p id="detailDescription" class="text-xs text-slate-200 leading-relaxed whitespace-pre-line">-</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                            <div class="bg-navy-800/60 p-2.5 rounded-xl border border-white/5">
+                                <span class="text-[9px] text-slate-400 uppercase block">Nama Pekerja</span>
+                                <span id="workerName" class="font-semibold text-white mt-0.5 block">-</span>
+                            </div>
+                            <div class="bg-navy-800/60 p-2.5 rounded-xl border border-white/5">
+                                <span class="text-[9px] text-slate-400 uppercase block">Nomor Iqama</span>
+                                <span id="workerIqama" class="font-semibold text-gold-400 font-mono mt-0.5 block">-</span>
+                            </div>
+                            <div class="bg-navy-800/60 p-2.5 rounded-xl border border-white/5">
+                                <span class="text-[9px] text-slate-400 uppercase block">ID Worker</span>
+                                <span id="workerId" class="font-semibold text-slate-300 font-mono mt-0.5 block">-</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- FORM JAWABAN LAWYER -->
-                    <form id="answerForm" onsubmit="handleSaveAnswer(event)" class="space-y-4">
+                    <!-- DESKRIPSI KRONOLOGI KASUS -->
+                    <div class="space-y-2">
+                        <h4 class="text-xs font-bold text-gold-400 flex items-center gap-1.5">
+                            <i data-lucide="file-text" class="w-4 h-4"></i> Kronologi Kejadian Pekerja:
+                        </h4>
+                        <div class="bg-navy-900 p-4 rounded-2xl border border-white/5 text-xs text-slate-200 leading-relaxed whitespace-pre-line" id="detailDescription">
+                            -
+                        </div>
+                    </div>
+
+                    <!-- FORM RESPON JAWABAN HUKUM -->
+                    <form id="answerForm" onsubmit="handleSaveAnswer(event)" class="space-y-4 pt-2">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">Jawaban Hukum (Bahasa Indonesia)</label>
-                            <textarea id="answerIndonesian" rows="5" required placeholder="Tulis rincian jawaban hukum, pasal yang berlaku, serta saran langkah selanjutnya..." class="w-full p-4 rounded-xl bg-navy-800 border border-white/10 text-white text-xs outline-none focus:border-gold-500 transition"></textarea>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1 flex justify-between">
+                                <span>Jawaban Analisis Hukum (Bahasa Indonesia)</span>
+                                <span class="text-[10px] text-amber-400">*Wajib Diisi</span>
+                            </label>
+                            <textarea id="answerIndonesian" rows="5" required placeholder="Jelaskan dasar hukum (Saudi Labor Law), analisis hak pekerja, dan rekomendasi tindakan selanjutnya..." class="w-full p-4 rounded-xl bg-navy-800 border border-white/10 text-white text-xs outline-none focus:border-gold-500 transition leading-relaxed"></textarea>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">Terjemahan Arab (Opsional - Otomatis terisi jika dikosongkan)</label>
-                            <textarea id="answerArabic" rows="4" dir="rtl" placeholder="الإجابة القانونية باللغة العربية..." class="w-full p-4 rounded-xl bg-navy-800 border border-white/10 text-white text-xs outline-none focus:border-gold-500 transition font-serif"></textarea>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1 flex justify-between">
+                                <span>Terjemahan Bahasa Arab (Terisi Otomatis oleh Sistem Terjemahan Backend jika kosong)</span>
+                                <span class="text-[10px] text-slate-400">Opsional</span>
+                            </label>
+                            <textarea id="answerArabic" rows="4" dir="rtl" placeholder="الإجابة والتوجيه القانوني باللغة العربية..." class="w-full p-4 rounded-xl bg-navy-800 border border-white/10 text-white text-xs outline-none focus:border-gold-500 transition font-serif leading-relaxed"></textarea>
                         </div>
 
-                        <div class="flex gap-3 pt-2">
+                        <!-- AKSI TOMBOL -->
+                        <div class="flex flex-col sm:flex-row gap-3 pt-2">
                             <button type="button" onclick="submitDraftOnly()" id="btnDraft" class="flex-1 py-3 bg-navy-800 hover:bg-navy-700 border border-white/10 text-white font-bold rounded-xl text-xs transition">
                                 Simpan Draft
                             </button>
-                            <button type="submit" id="btnApprove" class="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold rounded-xl text-xs hover:brightness-110 transition flex items-center justify-center gap-2">
-                                <i data-lucide="check-circle" class="w-4 h-4"></i> Setujui & Terbitkan ke Pekerja
+                            <button type="submit" id="btnApprove" class="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-110 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20">
+                                <i data-lucide="check-circle" class="w-4 h-4"></i> Terbitkan Jawaban Resmi ke Pekerja
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <!-- EMPTY STATE SELECTION -->
-                <div id="emptySelectCard" class="glass-card rounded-3xl p-12 text-center text-slate-400">
-                    <i data-lucide="mouse-pointer-click" class="w-10 h-10 mx-auto text-slate-600 mb-3"></i>
-                    <p class="text-xs">Pilih salah satu pertanyaan di sebelah kiri untuk meninjau kronologi dan memberikan jawaban hukum.</p>
+                <!-- STATE KOSONG (BELUM MEMILIH KASUS) -->
+                <div id="emptySelectCard" class="glass-card rounded-3xl p-16 text-center text-slate-400 flex flex-col items-center justify-center border border-dashed border-white/10 min-h-[400px]">
+                    <div class="w-16 h-16 rounded-full bg-navy-800 flex items-center justify-center text-slate-500 mb-4 border border-white/5">
+                        <i data-lucide="folder-search" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-white mb-1">Pilih Kasus untuk Meninjau</h3>
+                    <p class="text-xs text-slate-500 max-w-sm">Klik salah satu riwayat konsutasi di panel sebelah kiri untuk melihat rincian kasus, data pekerja, serta memberikan jawaban legal.</p>
                 </div>
             </div>
+
         </div>
     </main>
 
+    <!-- CONFIGURASI & BACKEND -->
     <script src="config.js"></script>
     <script>
         let globalCasesData = [];
         let selectedCase = null;
+        let currentUser = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
-            loadPendingCases();
+            checkAuthSession();
         });
 
-        // 1. Muat Semua Pertanyaan dari Backend
-        async function loadPendingCases() {
-            const listContainer = document.getElementById('casesList');
-            listContainer.innerHTML = '<p class="text-xs text-slate-500 italic">Mengambil data dari Google Sheets...</p>';
+        // 1. VERIFIKASI SESI LOGIN
+        function checkAuthSession() {
+            const userRaw = localStorage.getItem('currentUser');
+            if (!userRaw) {
+                document.getElementById('authGuardOverlay').classList.remove('hidden');
+                return;
+            }
 
             try {
-                const res = await callApi('getLawyerDashboard', { userId: 'LAWYER-01' });
-                
+                currentUser = JSON.parse(userRaw);
+                // Validasi role (harus LAWYER atau ADMIN)
+                if (currentUser.role && currentUser.role !== 'LAWYER' && currentUser.role !== 'ADMIN') {
+                    alert('Akun Anda tidak memiliki hak akses sebagai Pengacara.');
+                    handleLogout();
+                    return;
+                }
+
+                document.getElementById('lawyerNameDisplay').textContent = currentUser.fullName || currentUser.name || 'Adv. Legal Counsel';
+                loadDashboardData();
+            } catch (err) {
+                console.error("Gagal membaca sesi pengguna:", err);
+                redirectToLogin();
+            }
+        }
+
+        function redirectToLogin() {
+            window.location.href = 'login.html';
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            redirectToLogin();
+        }
+
+        // 2. AMBIL DATA UTAMA UNTUK LAWYER DARI BACKEND
+        async function loadDashboardData() {
+            const listContainer = document.getElementById('casesList');
+            listContainer.innerHTML = '<div class="glass-card rounded-2xl p-6 text-center text-xs text-slate-400 italic">Mengambil data dari server...</div>';
+
+            try {
+                const lawyerId = currentUser.userId || currentUser.email || 'LAWYER-01';
+                const res = await callApi('getLawyerDashboard', { userId: lawyerId });
+
                 if (res && res.success && res.data) {
                     const recentCases = res.data.recentCases || [];
                     globalCasesData = recentCases;
 
-                    // Update stats
-                    document.getElementById('statPendingCount').textContent = res.data.pendingCases || 0;
-                    document.getElementById('statAnsweredCount').textContent = res.data.approvedAnswers || 0;
-                    document.getElementById('statTotalCount').textContent = recentCases.length;
+                    // Re-render statistik
+                    document.getElementById('statPending').textContent = res.data.pendingCases || 0;
+                    document.getElementById('statAnswered').textContent = res.data.approvedAnswers || 0;
+                    document.getElementById('statTotal').textContent = recentCases.length;
+                    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                     if (recentCases.length === 0) {
-                        listContainer.innerHTML = '<div class="glass-card rounded-2xl p-6 text-center text-xs text-slate-400">Belum ada pertanyaan masuk.</div>';
+                        listContainer.innerHTML = '<div class="glass-card rounded-2xl p-6 text-center text-xs text-slate-400">Belum ada pertanyaan atau konsultasi masuk.</div>';
                         return;
                     }
 
-                    listContainer.innerHTML = recentCases.map(c => `
-                        <div onclick="selectCase('${c.caseId}')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-gold-500/50 transition border border-white/5 ${selectedCase?.caseId === c.caseId ? 'border-gold-500 bg-white/10' : ''}">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="px-2 py-0.5 rounded text-[9px] font-bold ${c.status === 'ANSWERED' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">
-                                    ${c.status || 'SUBMITTED'}
-                                </span>
-                                <span class="text-[9px] font-mono text-slate-400">${c.caseId}</span>
+                    // Render daftar kasus
+                    listContainer.innerHTML = recentCases.map(c => {
+                        const isSelected = selectedCase && selectedCase.caseId === c.caseId;
+                        const isAnswered = c.status === 'ANSWERED' || c.status === 'APPROVED';
+
+                        return `
+                            <div onclick="selectCase('${c.caseId}')" class="glass-card rounded-2xl p-4 cursor-pointer hover:border-gold-500/50 transition border ${isSelected ? 'border-gold-500 bg-white/10 shadow-lg' : 'border-white/5'}">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="px-2 py-0.5 rounded text-[9px] font-bold ${isAnswered ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}">
+                                        ${isAnswered ? 'TERJAWAB' : 'MENUNGGU JAWABAN'}
+                                    </span>
+                                    <span class="text-[9px] font-mono text-slate-400">${c.caseId}</span>
+                                </div>
+                                <h4 class="font-bold text-xs text-white line-clamp-1">${c.subject || c.category || 'Konsultasi Hukum'}</h4>
+                                <div class="flex justify-between items-center mt-2 pt-2 border-t border-white/5 text-[10px] text-slate-400">
+                                    <span class="font-mono text-gold-400/80">IQAMA: ${c.iqama || c.workerId || '-'}</span>
+                                    <span>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : ''}</span>
+                                </div>
                             </div>
-                            <h4 class="font-bold text-xs text-white line-clamp-1">${c.subject || c.category || 'Konsultasi'}</h4>
-                            <p class="text-[10px] text-slate-400 mt-1">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : ''}</p>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
+                } else {
+                    listContainer.innerHTML = '<div class="glass-card rounded-2xl p-6 text-center text-xs text-red-400">Gagal mengambil daftar kasus.</div>';
                 }
             } catch (err) {
-                console.error("Gagal muat data lawyer:", err);
-                listContainer.innerHTML = '<p class="text-xs text-red-400">Gagal terhubung ke backend API.</p>';
+                console.error("Gagal muat dashboard lawyer:", err);
+                listContainer.innerHTML = '<div class="glass-card rounded-2xl p-6 text-center text-xs text-red-400">Terjadi kesalahan koneksi.</div>';
             }
         }
 
-        // 2. Tampilkan Detail Pertanyaan yang Dipilih
+        // 3. PILIH DAN TAMPILKAN Rincian KASUS
         function selectCase(caseId) {
             selectedCase = globalCasesData.find(c => c.caseId === caseId);
             if (!selectedCase) return;
@@ -186,28 +319,34 @@
             const card = document.getElementById('caseDetailCard');
             card.classList.remove('hidden');
 
+            // Render informasi kasus
             document.getElementById('detailCategory').textContent = selectedCase.category || 'Umum';
-            document.getElementById('detailTitle').textContent = selectedCase.subject || selectedCase.title || 'Konsultasi Hukum';
+            document.getElementById('detailTitle').textContent = selectedCase.subject || selectedCase.title || 'Konsultasi Hukum Pekerja';
             document.getElementById('detailCaseId').textContent = selectedCase.caseId;
-            document.getElementById('detailWorkerId').textContent = selectedCase.workerId || selectedCase.userId || '-';
             document.getElementById('detailStatus').textContent = selectedCase.status || 'SUBMITTED';
-            document.getElementById('detailDescription').textContent = selectedCase.description || selectedCase.details || selectedCase.question || 'Tidak ada uraian kronologi.';
+            document.getElementById('detailDescription').textContent = selectedCase.description || selectedCase.details || selectedCase.question || 'Tidak ada detail kronologi yang diberikan.';
 
-            // Reset form
-            document.getElementById('answerIndonesian').value = '';
-            document.getElementById('answerArabic').value = '';
+            // Render data peserta/pekerja
+            document.getElementById('workerName').textContent = selectedCase.userName || selectedCase.workerName || 'Pekerja HAQ';
+            document.getElementById('workerIqama').textContent = selectedCase.iqama || selectedCase.iqamaNumber || '-';
+            document.getElementById('workerId').textContent = selectedCase.workerId || selectedCase.userId || '-';
 
-            loadPendingCases(); // re-render border seleksi
+            // Reset form jawaban
+            document.getElementById('answerIndonesian').value = selectedCase.lawyerAnswer || selectedCase.draftTextIndonesian || '';
+            document.getElementById('answerArabic').value = selectedCase.draftTextArabic || '';
+
+            // Update UI list untuk menampilkan mana yang sedang dipilih
+            loadDashboardData();
         }
 
-        // 3. Simpan Draft Jawaban
+        // 4. SIMPAN DRAFT JAWABAN
         async function submitDraftOnly() {
             if (!selectedCase) return;
             const textId = document.getElementById('answerIndonesian').value.trim();
             const textAr = document.getElementById('answerArabic').value.trim();
 
             if (!textId && !textAr) {
-                alert('Tulis jawaban terlebih dahulu!');
+                alert('Silakan tulis ringkasan draft jawaban terlebih dahulu.');
                 return;
             }
 
@@ -218,56 +357,70 @@
             try {
                 const res = await callApi('draftAnswer', {
                     caseId: selectedCase.caseId,
-                    lawyerId: 'LAWYER-01',
+                    lawyerId: currentUser.userId || 'LAWYER-01',
                     draftTextIndonesian: textId,
                     draftTextArabic: textAr
                 });
 
                 if (res && res.success) {
-                    alert('Draft jawaban berhasil disimpan.');
+                    alert('Draft jawaban hukum berhasil disimpan.');
                 } else {
-                    alert('Gagal: ' + (res?.error?.message || 'Terjadi kesalahan.'));
+                    alert('Gagal menyimpan draft: ' + (res?.error?.message || 'Kesalahan sistem'));
                 }
-            } catch (e) {
-                alert('Gagal mengirim draft.');
+            } catch (err) {
+                console.error("Error submit draft:", err);
+                alert('Terjadi kesalahan saat menyimpan draft.');
             } finally {
                 btn.disabled = false;
                 btn.innerText = 'Simpan Draft';
             }
         }
 
-        // 4. Setujui & Terbitkan Jawaban ke Pekerja
+        // 5. TERBITKAN DAN APPROVE JAWABAN KE PORTAL PEKERJA
         async function handleSaveAnswer(e) {
             e.preventDefault();
             if (!selectedCase) return;
 
+            const textId = document.getElementById('answerIndonesian').value.trim();
+            if (!textId) {
+                alert('Tulis jawaban hukum terlebih dahulu.');
+                return;
+            }
+
             const btn = document.getElementById('btnApprove');
             btn.disabled = true;
-            btn.innerText = 'Menerbitkan...';
+            btn.innerText = 'Menerbitkan Jawaban...';
 
             try {
-                // Step A: Buat/Update Draft lebih dulu
-                await submitDraftOnly();
+                // A. Simpan/Update Draft
+                await callApi('draftAnswer', {
+                    caseId: selectedCase.caseId,
+                    lawyerId: currentUser.userId || 'LAWYER-01',
+                    draftTextIndonesian: textId,
+                    draftTextArabic: document.getElementById('answerArabic').value.trim()
+                });
 
-                // Step B: Approve Jawaban
+                // B. Setujui Jawaban
                 const res = await callApi('approveAnswer', {
                     caseId: selectedCase.caseId,
-                    approvedBy: 'LAWYER-01'
+                    approvedBy: currentUser.userId || 'LAWYER-01'
                 });
 
                 if (res && res.success) {
-                    alert('Jawaban resmi berhasil disetujui dan diterbitkan ke Pekerja!');
-                    loadPendingCases();
+                    alert('Jawaban resmi berhasil disetujui dan diterbitkan ke portal Pekerja!');
                     document.getElementById('caseDetailCard').classList.add('hidden');
                     document.getElementById('emptySelectCard').classList.remove('hidden');
+                    selectedCase = null;
+                    loadDashboardData();
                 } else {
-                    alert('Gagal menyetujui: ' + (res?.error?.message || 'Kesalahan sistem'));
+                    alert('Gagal menerbitkan jawaban: ' + (res?.error?.message || 'Kesalahan sistem'));
                 }
             } catch (err) {
-                alert('Gagal menyetujui jawaban.');
+                console.error("Error approve answer:", err);
+                alert('Terjadi kesalahan saat menerbitkan jawaban.');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> Setujui & Terbitkan ke Pekerja';
+                btn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> Terbitkan Jawaban Resmi ke Pekerja';
                 lucide.createIcons();
             }
         }
