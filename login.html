@@ -67,12 +67,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             
-            // Auto redirect jika user sudah login sebelumnya
+            // Cek status login aktif
             const userRaw = localStorage.getItem('currentUser');
             if (userRaw) {
                 try {
                     const user = JSON.parse(userRaw);
-                    redirectUserByRole(user.role);
+                    if (user && user.role) {
+                        redirectUserByRole(user.role);
+                    } else {
+                        localStorage.removeItem('currentUser');
+                    }
                 } catch (e) {
                     localStorage.removeItem('currentUser');
                 }
@@ -86,12 +90,14 @@
         }
 
         function redirectUserByRole(role) {
-            const normalizedRole = (role || '').toUpperCase();
+            const normalizedRole = String(role || '').trim().toUpperCase();
+            
             if (normalizedRole === 'ADMIN' || normalizedRole === 'SUPER_ADMIN') {
                 window.location.href = 'admin.html';
             } else if (normalizedRole === 'LAWYER') {
                 window.location.href = 'lawyer.html';
             } else {
+                // Default diarahkan ke halaman worker jika role kosong atau bernilai WORKER
                 window.location.href = 'worker.html';
             }
         }
@@ -114,9 +120,21 @@
                     password: password 
                 });
 
-                if (res && res.success) {
-                    localStorage.setItem('currentUser', JSON.stringify(res.data));
-                    redirectUserByRole(res.data.role);
+                console.log("Response Login:", res);
+
+                if (res && (res.success || res.status === 'success')) {
+                    const userData = res.data || res.user || res;
+                    
+                    // Ekstrak role dan berikan fallback nilai ke 'WORKER'
+                    const userRole = (userData.role || userData.UserRole || 'WORKER').toString();
+                    
+                    const sessionData = {
+                        ...userData,
+                        role: userRole
+                    };
+
+                    localStorage.setItem('currentUser', JSON.stringify(sessionData));
+                    redirectUserByRole(userRole);
                 } else {
                     showError(res?.error?.message || res?.message || 'Kredensial tidak valid. Silakan periksa kembali email/nomor HP dan kata sandi Anda.');
                 }
