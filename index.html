@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HAQ SAUDI — منصة حق العامل في السعودية | Saudi Workers Rights</title>
-    <!-- Tailwind CSS with CDN -->
+    
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -68,7 +69,6 @@
 
             <!-- Language Switcher & Action Buttons -->
             <div class="flex items-center gap-4">
-                <!-- Multi-Language Selector -->
                 <div class="relative inline-block text-left">
                     <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-navy-800 text-xs text-gold-400 border border-gold-500/30 rounded-lg px-3 py-2 font-medium focus:outline-none focus:border-gold-500 cursor-pointer">
                         <option value="id">🇮🇩 Bahasa Indonesia</option>
@@ -153,7 +153,7 @@
                 <div class="grid sm:grid-cols-2 gap-4 mb-8 text-xs text-slate-300">
                     <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Penyimpanan Aman Dokumen Kontrak & Iqama</span></div>
                     <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Monitoring Masa Berlaku Iqama & Asuransi</span></div>
-                    <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Pencatatan Cuti Cuti Tahunan Lengkap</span></div>
+                    <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Pencatatan Cuti Tahunan Lengkap</span></div>
                     <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Konsultasi Kasus Ditinjau Advokat Lisensi Saudi</span></div>
                     <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Terjemahan Otomatis 3 Bahasa (ID, AR, EN)</span></div>
                     <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Kalkulasi Hak End of Service (Pesangon)</span></div>
@@ -164,7 +164,7 @@
         </div>
     </section>
 
-    <!-- PREMIUM POPUP MODAL: END OF SERVICE CALCULATOR -->
+    <!-- POPUP MODAL: END OF SERVICE CALCULATOR -->
     <div id="calcModal" class="fixed inset-0 z-50 hidden modal-blur flex items-center justify-center p-4">
         <div class="glass-card-light w-full max-w-lg rounded-3xl p-6 sm:p-8 text-slate-900 relative shadow-2xl animate-in fade-in zoom-in duration-200">
             <button onclick="closeModal('calcModal')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700">
@@ -245,11 +245,26 @@
         </div>
     </footer>
 
-    <!-- INTERACTION & TRANSLATION SCRIPT -->
+    <!-- SCRIPT LOGIC -->
+    <script src="config.js" onerror="console.warn('config.js not found - using inline fallbacks')"></script>
     <script>
-        lucide.createIcons();
+        // Initialize Lucide Icons
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) {
+                lucide.createIcons();
+            }
 
-        // Translation Dictionary Client Side
+            // Optional external API trigger check
+            if (typeof callApi === 'function') {
+                callApi('getPublicStats').then(res => {
+                    if (res && res.success) {
+                        console.log('Public stats loaded:', res.data);
+                    }
+                }).catch(() => {});
+            }
+        });
+
+        // Translation Dictionary
         const translations = {
             id: {
                 "nav.about": "Tentang Kami",
@@ -262,7 +277,11 @@
                 "hero.title": "Kenali Hakmu. Simpan Buktimu. <br><span class='bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-emerald-400 to-gold-500'>Dapatkan Pendampingan Hukum Saudi.</span>",
                 "hero.subtitle": "Platform legal-tech khusus pekerja Indonesia di Arab Saudi. Didukung penuh oleh alumni magister hukum/syariah Madinah dan advokat lisensi resmi Kerajaan Arab Saudi.",
                 "hero.ctaPrimary": "Mulai Lindungi Hak Anda",
-                "hero.ctaSecondary": "Simulasi Hak End of Service"
+                "hero.ctaSecondary": "Simulasi Hak End of Service",
+                "notice.title": "Pemberitahuan Transparansi & Kebijakan Transfer Resmi:",
+                "notice.body": "HAQ SAUDI tidak pernah meminta transfer biaya anggota ke rekening pribadi siapapun. Seluruh pembayaran anggota (SAR 99/tahun) HANYA dilakukan melalui Rekening Perusahaan Resmi yang tertera di dalam portal platform. Platform ini bertindak sebagai panduan hukum dan pengarsipan bukti digital, bukan pengganti instansi resmi pemerintah Saudi.",
+                "pricing.title": "Keanggotaan Perlindungan Tahunan",
+                "pricing.subtitle": "Satu harga transparan untuk perlindungan dan dokumentasi legal penuh selama 1 tahun."
             },
             ar: {
                 "nav.about": "من نحن",
@@ -275,7 +294,11 @@
                 "hero.title": "اعرف حقوقك، واحفظ مستنداتك، <br><span class='bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-emerald-400 to-gold-500'>واحصل على التوجيه القانوني السعودي.</span>",
                 "hero.subtitle": "منصة تقنية قانونية مخصصة للعمالة الإندونيسية في المملكة. مدعومة بنخبة من خريجي الدراسات القضائية بالمدينة المنورة ومحامين سعوديين مرخصين.",
                 "hero.ctaPrimary": "ابدأ بحماية حقوقك",
-                "hero.ctaSecondary": "حساب مكافأة نهاية الخدمة"
+                "hero.ctaSecondary": "حساب مكافأة نهاية الخدمة",
+                "notice.title": "تنبيه الشفافية وسياسة التحويل الرسمي:",
+                "notice.body": "لا تطلب HAQ SAUDI أبداً تحويل رسوم العضوية إلى حسابات شخصية. يتم دفع رسوم العضوية (99 ريال/سنوياً) حصرياً عبر حساب الشركة الرسمي الموضح في المنصة. تعمل المنصة كدليل قانوني وأرشيف رقمي، وليست بديلاً عن الجهات الحكومية الرسمية.",
+                "pricing.title": "العضوية السنوية للحماية",
+                "pricing.subtitle": "سعر شفاف واحد للحماية والتأصيل القانوني الكامل لمدة عام كامل."
             },
             en: {
                 "nav.about": "About Us",
@@ -288,7 +311,11 @@
                 "hero.title": "Know Your Rights. Protect Your Documents. <br><span class='bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-emerald-400 to-gold-500'>Get Saudi Legal Guidance.</span>",
                 "hero.subtitle": "Dedicated legal-tech platform for Indonesian workers in Saudi Arabia. Supported by judicial studies graduates in Madinah and licensed Saudi advocates.",
                 "hero.ctaPrimary": "Protect Your Rights Today",
-                "hero.ctaSecondary": "Calculate End of Service"
+                "hero.ctaSecondary": "Calculate End of Service",
+                "notice.title": "Transparency & Official Payment Policy Notice:",
+                "notice.body": "HAQ SAUDI never requests membership payments to personal accounts. All membership fees (SAR 99/year) MUST be paid directly to the Official Company Account listed in the portal. This platform acts as a legal guide and digital archive, not a substitute for Saudi government bodies.",
+                "pricing.title": "Annual Protection Membership",
+                "pricing.subtitle": "One transparent price for full legal documentation and protection for 1 year."
             }
         };
 
@@ -313,45 +340,33 @@
             document.getElementById(id).classList.add('hidden');
         }
 
+        // Saudi Labor Law EOS Calculation (Articles 84 & 85)
         function calculateEOS() {
             const salary = parseFloat(document.getElementById('calcSalary').value) || 0;
             const years = parseFloat(document.getElementById('calcYears').value) || 0;
             const reason = document.getElementById('calcReason').value;
 
-            if (!salary || !years) return;
+            if (salary <= 0 || years <= 0) return;
 
             let total = 0;
-            // Saudi Labor Law Rules (Article 84)
+            
+            // Article 84: Standard EOS scale
             if (years <= 5) {
                 total = (salary / 2) * years;
             } else {
                 total = (salary / 2) * 5 + salary * (years - 5);
             }
 
-            // Adjustment for Resignation (Article 85)
+            // Article 85: Resignation scaling
             if (reason === 'RESIGN') {
                 if (years < 2) total = 0;
-                else if (years < 5) total = total * (1/3);
-                else if (years < 10) total = total * (2/3);
+                else if (years < 5) total = total * (1 / 3);
+                else if (years < 10) total = total * (2 / 3);
             }
 
             document.getElementById('eosAmount').innerText = Math.round(total).toLocaleString() + ' SAR';
             document.getElementById('calcResult').classList.remove('hidden');
         }
-    </script><!-- Script Konfigurasi & Interaktif -->
-    <script src="config.js"></script>
-    <script>
-        lucide.createIcons();
-
-        // Mengambil data statistik umum dari Google Sheets saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', async () => {
-            const res = await callApi('getPublicStats');
-            if (res.success) {
-                console.log('Statistik berhasil dimuat:', res.data);
-            }
-        });
     </script>
-</body>
-</html>
 </body>
 </html>
