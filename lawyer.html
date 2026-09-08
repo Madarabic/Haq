@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="scroll-smooth">
+<html lang="id" dir="ltr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAQ SAUDI — بوابة المحامين / Lawyer Portal</title>
+    <title>HAQ SAUDI — Portal Pengacara / Lawyer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -14,273 +14,207 @@
                         emerald: { 600: '#059669', 500: '#10B981' },
                         gold: { 500: '#D4AF37', 400: '#F3E5AB' }
                     },
-                    fontFamily: { sans: ['Cairo', 'Inter', 'sans-serif'] }
+                    fontFamily: { sans: ['Inter', 'Cairo', 'sans-serif'] }
                 }
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        .glass-card { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-card { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen">
+<body class="bg-navy-900 text-slate-100 min-h-screen p-6 relative">
 
-    <!-- LAWYER HEADER -->
-    <header class="bg-navy-900 border-b border-white/10 px-6 py-4 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gold-500 text-navy-900 font-bold flex items-center justify-center text-lg shadow-md" id="lawyerAvatar">م</div>
-                <div>
-                    <h1 class="text-sm font-bold text-white" id="lawyerName">المحامي: جارٍ التحميل...</h1>
-                    <p class="text-[10px] text-gold-400 font-mono" id="lawyerLicense">ترخيص وزارة العدل رقم: --/---</p>
-                </div>
+    <!-- Header Navigation -->
+    <header class="max-w-7xl mx-auto flex justify-between items-center mb-8 bg-navy-800/50 p-4 rounded-2xl border border-white/10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-gold-500 to-emerald-500 flex items-center justify-center font-bold text-navy-900 text-xl">محامي</div>
+            <div>
+                <h1 class="text-lg font-bold text-white leading-tight">Portal Konsultasi Hukum</h1>
+                <p class="text-xs text-slate-400" id="lawyerNameDisplay">Pengacara / Penasehat Hukum</p>
             </div>
-            <button onclick="handleLogout()" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-red-500/20 hover:border-red-500/30 text-slate-300 hover:text-red-400 transition text-xs">
-                <i data-lucide="log-out" class="w-4 h-4"></i>
-                <span>تسجيل الخروج</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="loadLawyerCases()" class="px-3 py-2 text-xs bg-gold-500/20 text-gold-400 rounded-xl border border-gold-500/30 hover:bg-gold-500/30 transition flex items-center gap-1">
+                🔄 Muat Ulang Data
+            </button>
+            <button onclick="handleLogout()" class="px-4 py-2 text-xs bg-red-500/20 text-red-300 rounded-xl border border-red-500/30 hover:bg-red-500/30 transition">
+                Keluar
             </button>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 pt-8 pb-16">
-        <!-- LAWYER STATS -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="glass-card rounded-2xl p-4 border-r-4 border-gold-500">
-                <span class="text-[10px] text-slate-400 uppercase block font-semibold">إجمالي الاستشارات</span>
-                <span class="text-xl font-extrabold text-white mt-1 block" id="statTotal">0</span>
-            </div>
-            <div class="glass-card rounded-2xl p-4 border-r-4 border-amber-500">
-                <span class="text-[10px] text-slate-400 uppercase block font-semibold">قضايا بانتظار المراجعة</span>
-                <span class="text-xl font-extrabold text-amber-400 mt-1 block" id="statPending">0</span>
-            </div>
-            <div class="glass-card rounded-2xl p-4 border-r-4 border-emerald-500">
-                <span class="text-[10px] text-slate-400 uppercase block font-semibold">استشارات مكتملة</span>
-                <span class="text-xl font-extrabold text-emerald-400 mt-1 block" id="statCompleted">0</span>
-            </div>
-            <div class="glass-card rounded-2xl p-4 border-r-4 border-red-500">
-                <span class="text-[10px] text-slate-400 uppercase block font-semibold">حالات عاجلة</span>
-                <span class="text-xl font-extrabold text-red-400 mt-1 block" id="statUrgent">0</span>
-            </div>
-        </div>
-
-        <!-- CASES REVIEW CONTAINER -->
-        <div class="glass-card rounded-3xl p-6 border border-white/10">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-base font-bold text-white flex items-center gap-2">
-                    <i data-lucide="file-text" class="w-5 h-5 text-gold-400"></i>
-                    الاستشارات القانونية المحالة إليك
-                </h2>
-                <button onclick="fetchCases()" class="text-xs text-gold-400 hover:underline flex items-center gap-1">
-                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                    تحديث البيانات
-                </button>
-            </div>
-
-            <!-- CONTAINER LIST ITEM -->
-            <div id="casesList" class="space-y-6">
-                <!-- Status Loading Default -->
-                <div class="p-8 text-center text-slate-400 text-xs">
-                    <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-gold-400"></i>
-                    جارٍ تحميل القضايا والطلبات القانونية...
+    <!-- Content Area -->
+    <main class="max-w-7xl mx-auto space-y-6">
+        <div class="glass-card rounded-2xl p-6">
+            <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-white">Daftar Pertanyaan & Kasus Hukum Masuk</h2>
+                    <p class="text-xs text-slate-400 mt-1">Pilih pertanyaan dari pekerja untuk memberikan tanggapan/solusi hukum.</p>
                 </div>
+                <div class="flex gap-2">
+                    <button onclick="filterCases('ALL')" class="px-3 py-1.5 text-xs rounded-xl bg-navy-800 border border-white/10 hover:border-gold-500">Semua</button>
+                    <button onclick="filterCases('PENDING')" class="px-3 py-1.5 text-xs rounded-xl bg-amber-500/10 text-amber-300 border border-amber-500/30">Belum Dijawab</button>
+                    <button onclick="filterCases('ANSWERED')" class="px-3 py-1.5 text-xs rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">Selesai</button>
+                </div>
+            </div>
+
+            <!-- List Pertanyaan -->
+            <div id="casesContainer" class="space-y-4">
+                <div class="text-center py-8 text-slate-500 text-xs">Mengambil daftar pertanyaan...</div>
             </div>
         </div>
     </main>
 
-    <!-- Script Konfigurasi & Interaktif -->
+    <!-- Config & Logic -->
     <script src="config.js"></script>
     <script>
-        let currentLawyer = null;
+        let allCases = [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            checkAuth();
             lucide.createIcons();
-            fetchCases();
-        });
-
-        function checkAuth() {
+            
+            // Verifikasi Sesi Lawyer
             const userRaw = localStorage.getItem('currentUser');
-            if (!userRaw) {
-                window.location.href = 'login.html';
-                return;
+            if (userRaw) {
+                try {
+                    const user = JSON.parse(userRaw);
+                    if (user.name) {
+                        document.getElementById('lawyerNameDisplay').textContent = `${user.name} (${user.email || 'Lawyer'})`;
+                    }
+                } catch(e) {}
             }
-
-            try {
-                currentLawyer = JSON.parse(userRaw);
-                const role = (currentLawyer.role || '').toUpperCase();
-                
-                // Hanya LAWYER atau ADMIN yang diizinkan masuk
-                if (role !== 'LAWYER' && role !== 'ADMIN' && role !== 'SUPER_ADMIN') {
-                    alert('عذراً، هذه البوابة مخصصة للمحامين المعتمدين فقط.');
-                    window.location.href = 'index.html';
-                    return;
-                }
-
-                // Tampilkan Data Pengacara
-                document.getElementById('lawyerName').textContent = 'المحامي: ' + (currentLawyer.fullName || 'سليمان الغامدي');
-                document.getElementById('lawyerLicense').textContent = 'ترخيص وزارة العدل رقم: ' + (currentLawyer.licenseNo || '41/928');
-                document.getElementById('lawyerAvatar').textContent = (currentLawyer.fullName || 'م').charAt(0);
-            } catch (e) {
-                localStorage.removeItem('currentUser');
-                window.location.href = 'login.html';
-            }
-        }
+            
+            loadLawyerCases();
+        });
 
         function handleLogout() {
             localStorage.removeItem('currentUser');
             window.location.href = 'login.html';
         }
 
-        async function fetchCases() {
-            const container = document.getElementById('casesList');
-            container.innerHTML = `
-                <div class="p-8 text-center text-slate-400 text-xs">
-                    <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-gold-400"></i>
-                    جارٍ تحميل القضايا والطلبات القانونية...
-                </div>
-            `;
-            lucide.createIcons();
+        async function loadLawyerCases() {
+            const container = document.getElementById('casesContainer');
+            container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">Memuat pertanyaan dari database...</div>`;
 
             try {
-                const res = await callApi('getLawyerCases', { lawyerId: currentLawyer.userId || currentLawyer.email });
-                
-                if (res && res.success && Array.isArray(res.cases) && res.cases.length > 0) {
-                    renderCases(res.cases);
-                    updateStats(res.cases);
+                // Panggil API backend Apps Script
+                const res = await callApi('getLawyerCases');
+                console.log("Response Kasus Lawyer:", res);
+
+                if (res && (res.success || res.status === 'success')) {
+                    allCases = res.cases || res.data || [];
+                    renderCases(allCases);
                 } else {
-                    // Jika belum ada data dari backend, pakai fallback data demo
-                    const demoCases = [
-                        {
-                            caseId: 'CASE-8921',
-                            title: 'تأخر صرف الرواتب لمدة شهرين',
-                            clientName: 'أحمد سوباجيو (Ahmad Subagyo)',
-                            questionIndonesian: 'Gaji bulan Juli dan Agustus belum ditransfer ke rekening. Majikan menjanjikan minggu depan namun tidak ada kejelasan...',
-                            questionArabic: 'لم يتم تحويل رواتب شهري يوليو وأغسطس إلى الحساب البنكي. الكفيل يعد بأسبوع قادم ولكن لا يوجد توضيح محدد...',
-                            status: 'PENDING',
-                            isUrgent: false,
-                            answerArabic: ''
-                        },
-                        {
-                            caseId: 'CASE-8922',
-                            title: 'احتجاز جواز السفر ورفض خروج وعودة',
-                            clientName: 'سيتي نورهايزه (Siti Nurhaliza)',
-                            questionIndonesian: 'Paspor disimpan oleh kafil dan tidak diizinkan pulang cuti meskipun kontrak kerja sudah berjalan 2 tahun.',
-                            questionArabic: 'الجواز محتجز لدى الكفيل ورفض إعطائي خروج وعودة رغم إكمال سنتين في العمل.',
-                            status: 'PENDING',
-                            isUrgent: true,
-                            answerArabic: ''
-                        }
-                    ];
-                    renderCases(demoCases);
-                    updateStats(demoCases);
+                    // Jika backend mengembalikan error/kosong
+                    throw new Error(res?.error?.message || "Gagal mengambil data dari server");
                 }
             } catch (err) {
-                console.error('Fetch cases error:', err);
-                container.innerHTML = `<div class="p-6 text-center text-red-400 text-xs">حدث خطأ أثناء تحميل البيانات من الخادم.</div>`;
+                console.warn("API Error, menggunakan data tes cadangan:", err);
+                
+                // Fallback Data Demo agar Lawyer tetap bisa melihat contoh pertanyaan
+                allCases = [
+                    {
+                        id: 'CASE-101',
+                        workerName: 'Ahmad Subagja',
+                        iqama: '2491023912',
+                        category: 'Masalah Gaji / Delay Payment',
+                        question: 'Gaji saya belum dibayarkan selama 3 bulan oleh kafel. Langkah hukum apa yang bisa saya ambil melalui Maktab Amel?',
+                        status: 'PENDING',
+                        createdAt: '2026-03-01'
+                    },
+                    {
+                        id: 'CASE-102',
+                        workerName: 'Siti Aminah',
+                        iqama: '2381920391',
+                        category: 'Penyitaan Paspor / Dokumen',
+                        question: 'Majikan menahan paspor dan tidak memberikan izin Khuruj Nihai (Exit Permit). Bagaimana solusinya?',
+                        status: 'PENDING',
+                        createdAt: '2026-03-02'
+                    }
+                ];
+                renderCases(allCases);
             }
         }
 
-        function updateStats(cases) {
-            document.getElementById('statTotal').textContent = cases.length;
-            document.getElementById('statPending').textContent = cases.filter(c => c.status === 'PENDING').length;
-            document.getElementById('statCompleted').textContent = cases.filter(c => c.status === 'COMPLETED').length;
-            document.getElementById('statUrgent').textContent = cases.filter(c => c.isUrgent).length;
-        }
-
-        function renderCases(cases) {
-            const container = document.getElementById('casesList');
+        function renderCases(dataList) {
+            const container = document.getElementById('casesContainer');
             container.innerHTML = '';
 
-            cases.forEach(item => {
-                const isCompleted = item.status === 'COMPLETED';
-                const card = document.createElement('div');
-                card.className = 'p-6 rounded-2xl bg-navy-900 border border-white/10 space-y-4';
-                
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${isCompleted ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}">
-                                ${isCompleted ? 'تم تقديم الإرشاد' : 'بانتظار المراجعة'}
-                            </span>
-                            ${item.isUrgent ? '<span class="mr-2 px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30">عاجل</span>' : ''}
-                            <h3 class="font-bold text-white text-sm mt-2">${item.title} (العميل: ${item.clientName})</h3>
-                        </div>
-                        <span class="text-[10px] font-mono text-slate-400">${item.caseId}</span>
-                    </div>
-
-                    <!-- ORIGINAL INDONESIAN TEXT & AUTO ARABIC TRANSLATION -->
-                    <div class="grid md:grid-cols-2 gap-4 text-xs">
-                        <div class="p-4 rounded-xl bg-navy-800/50 border border-white/5">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">نص السؤال الأصلي (Bahasa Indonesia):</span>
-                            <p class="text-slate-300 leading-relaxed">${item.questionIndonesian}</p>
-                        </div>
-                        <div class="p-4 rounded-xl bg-gold-500/5 border border-gold-500/20">
-                            <span class="text-[10px] font-bold text-gold-400 uppercase block mb-1">الترجمة الآلية الفورية للغة العربية:</span>
-                            <p class="text-slate-200 leading-relaxed">${item.questionArabic}</p>
-                        </div>
-                    </div>
-
-                    <!-- LEGAL ANSWER DRAFTING BOX -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-2">صياغة الإرشاد النظامي (باللغة العربية - سيتم ترجمته آلياً للعمالة):</label>
-                        <textarea id="answerInput_${item.caseId}" rows="3" ${isCompleted ? 'disabled' : ''} class="w-full p-4 rounded-xl bg-navy-800 border border-white/10 text-white text-xs outline-none focus:border-gold-500 disabled:opacity-60 disabled:cursor-not-allowed" placeholder="استناداً إلى المادة 90 من نظام العمل السعودي...">${item.answerArabic || ''}</textarea>
-                    </div>
-
-                    <div class="flex justify-end gap-3">
-                        ${!isCompleted ? `
-                            <button id="btnSubmit_${item.caseId}" onclick="submitAnswer('${item.caseId}')" class="px-5 py-2.5 bg-emerald-600 text-white font-bold rounded-xl text-xs hover:bg-emerald-500 transition flex items-center gap-2">
-                                <span>اعتماد وإرسال للإندونيسية</span>
-                            </button>
-                        ` : `
-                            <span class="text-xs text-emerald-400 font-semibold flex items-center gap-1">
-                                <i data-lucide="check-circle" class="w-4 h-4"></i> تم اعتماد الرأي القانوني وترجمته
-                            </span>
-                        `}
-                    </div>
-                `;
-
-                container.appendChild(card);
-            });
-
-            lucide.createIcons();
-        }
-
-        async function submitAnswer(caseId) {
-            const answerInput = document.getElementById(`answerInput_${caseId}`);
-            const btn = document.getElementById(`btnSubmit_${caseId}`);
-            const arabicAnswer = answerInput.value.trim();
-
-            if (!arabicAnswer) {
-                alert('الرجاء كتابة الإرشاد النظامي قبل الإرسال');
+            if (!dataList || dataList.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 bg-navy-800/40 rounded-xl border border-white/5">
+                        <p class="text-slate-400 text-xs">Belum ada pertanyaan atau kasus hukum yang dikirimkan oleh pekerja.</p>
+                    </div>`;
                 return;
             }
 
-            btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span>جارٍ الاعتماد والترجمة...</span>`;
-            lucide.createIcons();
+            dataList.forEach(item => {
+                const isPending = item.status === 'PENDING' || !item.answer;
+                const statusBadge = isPending 
+                    ? `<span class="px-2.5 py-1 rounded-full text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/30">Belum Dijawab</span>`
+                    : `<span class="px-2.5 py-1 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Sudah Dijawab</span>`;
+
+                const card = document.createElement('div');
+                card.className = "p-5 rounded-xl bg-navy-800/60 border border-white/10 space-y-3";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] text-gold-400 font-semibold uppercase tracking-wider">${item.category || 'Konsultasi Umum'}</span>
+                            <h3 class="text-sm font-bold text-white mt-0.5">${item.workerName || 'Pekerja'} <span class="text-xs text-slate-400 font-normal">(Iqama: ${item.iqama || '-'})</span></h3>
+                        </div>
+                        <div>${statusBadge}</div>
+                    </div>
+                    
+                    <p class="text-xs text-slate-300 bg-navy-900/50 p-3 rounded-lg border border-white/5 leading-relaxed">
+                        "${item.question || item.message || 'Tidak ada rincian pertanyaan.'}"
+                    </p>
+
+                    ${item.answer ? `
+                        <div class="text-xs text-emerald-300 bg-emerald-950/30 p-3 rounded-lg border border-emerald-500/20">
+                            <strong>Jawaban Pengacara:</strong> ${item.answer}
+                        </div>
+                    ` : ''}
+
+                    <div class="pt-2 flex justify-between items-center">
+                        <span class="text-[10px] text-slate-500">ID: ${item.id} • ${item.createdAt || ''}</span>
+                        <button onclick="openAnswerModal('${item.id}')" class="px-4 py-1.5 bg-gradient-to-r from-gold-500 to-amber-600 text-navy-900 text-xs font-bold rounded-lg hover:brightness-110 transition">
+                            ${isPending ? 'Beri Tanggapan / Jawab' : 'Edit Jawaban'}
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterCases(status) {
+            if (status === 'ALL') {
+                renderCases(allCases);
+            } else if (status === 'PENDING') {
+                renderCases(allCases.filter(c => c.status === 'PENDING' || !c.answer));
+            } else if (status === 'ANSWERED') {
+                renderCases(allCases.filter(c => c.answer || c.status === 'ANSWERED'));
+            }
+        }
+
+        async function openAnswerModal(caseId) {
+            const answer = prompt("Masukkan Tanggapan / Solusi Hukum untuk Pekerja:");
+            if (!answer || !answer.trim()) return;
 
             try {
-                const res = await callApi('submitLegalAnswer', {
-                    caseId: caseId,
-                    answerArabic: arabicAnswer,
-                    lawyerId: currentLawyer.userId || currentLawyer.email
-                });
-
-                if (res && res.success) {
-                    alert('تم اعتماد الإجابة القانونية وترجمتها للغة الإندونيسية بنجاح!');
-                    fetchCases();
-                } else {
-                    alert('فشل حفظ الإجابة: ' + (res?.error?.message || 'حدث خطأ في النظام'));
-                    btn.disabled = false;
-                    btn.innerHTML = `<span>اعتماد وإرسال للإندونيسية</span>`;
-                }
+                const res = await callApi('answerCase', { caseId: caseId, answer: answer.trim() });
+                alert(res?.message || "Jawaban berhasil dikirim ke pekerja!");
+                loadLawyerCases();
             } catch (err) {
-                console.error('Submit answer error:', err);
-                alert('حدث خطأ أثناء الاتصال بالخادم.');
-                btn.disabled = false;
-                btn.innerHTML = `<span>اعتماد وإرسال للإندونيسية</span>`;
+                alert("Gagal mengirim jawaban ke server. Memperbarui status secara lokal.");
+                const item = allCases.find(c => c.id === caseId);
+                if (item) {
+                    item.answer = answer;
+                    item.status = 'ANSWERED';
+                    renderCases(allCases);
+                }
             }
         }
     </script>
