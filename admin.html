@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAQ SAUDI — Admin Control Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 900: '#001A2C', 800: '#002B49', 700: '#003B63' },
+                        emerald: { 600: '#059669', 500: '#10B981' },
+                        gold: { 500: '#D4AF37', 400: '#F3E5AB' }
+                    },
+                    fontFamily: { sans: ['Inter', 'Cairo', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .glass-card { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+    <header class="bg-navy-900 border-b border-white/10 px-6 py-4 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-emerald-500 text-navy-900 font-bold flex items-center justify-center text-lg">A</div>
+                <div>
+                    <h1 class="text-sm font-bold text-white">System Administrator Portal</h1>
+                    <p class="text-[10px] text-slate-400 font-mono">Google Sheets DB Connected</p>
+                </div>
+            </div>
+            <a href="index.html" class="p-2 text-slate-400 hover:text-white"><i data-lucide="log-out" class="w-5 h-5"></i></a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 pt-8">
+        <!-- ADMIN OVERVIEW STATS -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass-card rounded-2xl p-4 border-l-4 border-emerald-500">
+                <span class="text-[10px] text-slate-400 uppercase block font-semibold">Total Pekerja</span>
+                <span class="text-xl font-extrabold text-white mt-1 block">142</span>
+            </div>
+            <div class="glass-card rounded-2xl p-4 border-l-4 border-amber-500">
+                <span class="text-[10px] text-slate-400 uppercase block font-semibold">Verifikasi Transfer Pending</span>
+                <span class="text-xl font-extrabold text-amber-400 mt-1 block">5 SAR (99x5)</span>
+            </div>
+            <div class="glass-card rounded-2xl p-4 border-l-4 border-gold-500">
+                <span class="text-[10px] text-slate-400 uppercase block font-semibold">Pengacara Aktif</span>
+                <span class="text-xl font-extrabold text-gold-400 mt-1 block">6</span>
+            </div>
+            <div class="glass-card rounded-2xl p-4 border-l-4 border-emerald-500">
+                <span class="text-[10px] text-slate-400 uppercase block font-semibold">Total Revenue (SAR)</span>
+                <span class="text-xl font-extrabold text-emerald-400 mt-1 block">13,563 SAR</span>
+            </div>
+        </div>
+
+        <!-- PAYMENT VERIFICATION & WORKER APPROVAL TABLE -->
+        <div class="glass-card rounded-3xl p-6 border border-white/10 mb-8">
+            <h2 class="text-base font-bold text-white mb-4">Persetujuan Pendaftaran & Pembayaran SAR 99</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="bg-navy-800 text-gold-400 font-semibold uppercase text-[10px]">
+                        <tr>
+                            <th class="p-3">Nama Pekerja</th>
+                            <th class="p-3">No. Iqama</th>
+                            <th class="p-3">Bukti Transfer</th>
+                            <th class="p-3">Status Subskripsi</th>
+                            <th class="p-3">Aksi Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <tr>
+                            <td class="p-3 font-semibold text-white">Budi Santoso</td>
+                            <td class="p-3 font-mono">2391029312</td>
+                            <td class="p-3"><a href="#" class="text-gold-400 hover:underline">Lihat Slip (PDF)</a></td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px]">PAYMENT UNDER REVIEW</span></td>
+                            <td class="p-3 flex gap-2">
+                                <button onclick="verifyPayment('2391029312', 'APPROVE')" class="px-3 py-1 bg-emerald-600 text-white font-bold rounded hover:bg-emerald-500 transition">Setujui</button>
+                                <button onclick="verifyPayment('2391029312', 'REJECT')" class="px-3 py-1 bg-red-600/30 text-red-300 font-bold rounded hover:bg-red-600/50 transition">Tolak</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- 1. Panggil file konfigurasi API -->
+    <script src="config.js"></script>
+    
+    <!-- 2. Skrip Interaktif Admin -->
+    <script>
+        lucide.createIcons();
+
+        // Fungsi untuk verifikasi pembayaran/pendaftaran
+        async function verifyPayment(workerId, actionType) {
+            const confirmMsg = actionType === 'APPROVE' 
+                ? 'Apakah Anda yakin ingin menyetujui pendaftaran & pembayaran ini?' 
+                : 'Apakah Anda yakin ingin menolak pembayaran ini?';
+
+            if (!confirm(confirmMsg)) return;
+
+            const response = await callApi('verifyWorkerSubscription', {
+                workerId: workerId,
+                status: actionType
+            });
+
+            if (response.success) {
+                alert('Status pendaftaran berhasil diperbarui!');
+                location.reload();
+            } else {
+                alert('Gagal memperbarui status: ' + (response.error?.message || 'Terjadi kesalahan sistem.'));
+            }
+        }
+    </script>
+</body>
+</html>

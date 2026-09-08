@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="id" dir="ltr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAQ SAUDI — منصة حق العامل في السعودية | Saudi Workers Rights</title>
+    <!-- Tailwind CSS with CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 900: '#001A2C', 800: '#002B49', 700: '#003B63' },
+                        emerald: { 600: '#059669', 500: '#10B981' },
+                        gold: { 500: '#D4AF37', 400: '#F3E5AB' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Cairo', 'sans-serif'],
+                        arabic: ['Cairo', 'Tajawal', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card-light {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .modal-blur {
+            backdrop-filter: blur(8px);
+            background: rgba(0, 26, 44, 0.75);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans selection:bg-gold-500 selection:text-navy-900">
+
+    <!-- NAVIGATION BAR -->
+    <nav class="fixed top-0 w-full z-50 glass-card border-b border-white/10 px-6 py-4 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-gold-500 to-emerald-500 flex items-center justify-center font-bold text-navy-900 text-xl shadow-lg shadow-gold-500/20">
+                    حق
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-gold-400">HAQ SAUDI</span>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest font-mono">Saudi Workers Rights</p>
+                </div>
+            </div>
+
+            <!-- Nav Links -->
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+                <a href="#about" class="hover:text-gold-400 transition" data-i18n="nav.about">Tentang Kami</a>
+                <a href="#services" class="hover:text-gold-400 transition" data-i18n="nav.services">Layanan</a>
+                <a href="#pricing" class="hover:text-gold-400 transition" data-i18n="nav.pricing">Keanggotaan</a>
+                <a href="#faq" class="hover:text-gold-400 transition" data-i18n="nav.faq">FAQ</a>
+            </div>
+
+            <!-- Language Switcher & Action Buttons -->
+            <div class="flex items-center gap-4">
+                <!-- Multi-Language Selector -->
+                <div class="relative inline-block text-left">
+                    <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-navy-800 text-xs text-gold-400 border border-gold-500/30 rounded-lg px-3 py-2 font-medium focus:outline-none focus:border-gold-500 cursor-pointer">
+                        <option value="id">🇮🇩 Bahasa Indonesia</option>
+                        <option value="ar">🇸🇦 العربية (RTL)</option>
+                        <option value="en">🇬🇧 English</option>
+                    </select>
+                </div>
+
+                <a href="login.html" class="hidden sm:inline-flex px-4 py-2 text-xs font-semibold text-slate-200 border border-white/20 rounded-lg hover:bg-white/10 transition" data-i18n="nav.login">Masuk</a>
+                <a href="register.html" class="px-5 py-2 text-xs font-bold bg-gradient-to-r from-gold-500 to-amber-600 text-navy-900 rounded-lg shadow-lg hover:brightness-110 transition" data-i18n="nav.register">Daftar Sekarang</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-36 pb-24 px-6 overflow-hidden">
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-gold-500/30 text-gold-400 text-xs font-semibold mb-8 animate-pulse">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                <span data-i18n="hero.badge">Platform Perlindungan Hukum Migran Resmi & Terpercaya</span>
+            </div>
+            
+            <h1 class="text-4xl sm:text-6xl font-extrabold text-white leading-tight mb-6" data-i18n="hero.title">
+                Kenali Hakmu. Simpan Buktimu. <br>
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-emerald-400 to-gold-500">Dapatkan Pendampingan Hukum Saudi.</span>
+            </h1>
+
+            <p class="text-lg text-slate-300 max-w-3xl mx-auto mb-10 leading-relaxed font-light" data-i18n="hero.subtitle">
+                Platform legal-tech khusus pekerja Indonesia di Arab Saudi. Didukung penuh oleh alumni magister hukum/syariah Madinah dan advokat lisensi resmi Kerajaan Arab Saudi.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="register.html" class="w-full sm:w-auto px-8 py-4 text-sm font-bold bg-gradient-to-r from-gold-500 to-emerald-600 text-navy-900 rounded-xl shadow-xl shadow-gold-500/10 hover:scale-105 transition duration-300 flex items-center justify-center gap-2">
+                    <span data-i18n="hero.ctaPrimary">Mulai Lindungi Hak Anda</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+                <button onclick="openModal('calcModal')" class="w-full sm:w-auto px-8 py-4 text-sm font-semibold glass-card text-slate-200 rounded-xl border border-white/10 hover:bg-white/10 transition flex items-center justify-center gap-2">
+                    <i data-lucide="calculator" class="w-4 h-4 text-gold-400"></i>
+                    <span data-i18n="hero.ctaSecondary">Simulasi Hak End of Service</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- OFFICIAL NOTICE BANNER -->
+    <div class="max-w-7xl mx-auto px-6 mb-16">
+        <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-4">
+            <i data-lucide="alert-triangle" class="w-6 h-6 text-amber-400 shrink-0 mt-0.5"></i>
+            <div class="text-xs text-amber-200/90 leading-relaxed">
+                <strong class="font-bold text-amber-300 uppercase block mb-1" data-i18n="notice.title">Pemberitahuan Transparansi & Kebijakan Transfer Resmi:</strong>
+                <span data-i18n="notice.body">HAQ SAUDI tidak pernah meminta transfer biaya anggota ke rekening pribadi siapapun. Seluruh pembayaran anggota (SAR 99/tahun) HANYA dilakukan melalui Rekening Perusahaan Resmi yang tertera di dalam portal platform. Platform ini bertindak sebagai panduan hukum dan pengarsipan bukti digital, bukan pengganti instansi resmi pemerintah Saudi.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRICING SECTION -->
+    <section id="pricing" class="py-20 px-6 relative bg-navy-900/50">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold text-white mb-4" data-i18n="pricing.title">Keanggotaan Perlindungan Tahunan</h2>
+                <p class="text-slate-400 text-sm" data-i18n="pricing.subtitle">Satu harga transparan untuk perlindungan dan dokumentasi legal penuh selama 1 tahun.</p>
+            </div>
+
+            <div class="glass-card rounded-3xl p-8 sm:p-12 border border-gold-500/30 relative overflow-hidden shadow-2xl">
+                <div class="absolute -top-12 -right-12 w-40 h-40 bg-gold-500/10 rounded-full blur-2xl"></div>
+                <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-8 border-b border-white/10 pb-8">
+                    <div>
+                        <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Paket Resmi Pekerja</span>
+                        <h3 class="text-2xl font-bold text-white mt-2">HAQ Annual Protection</h3>
+                        <p class="text-xs text-slate-400 mt-1">Akses penuh sistem dokumentasi + Tinjauan Pengacara</p>
+                    </div>
+                    <div class="text-center md:text-right">
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-5xl font-extrabold text-gold-400">99</span>
+                            <span class="text-lg font-bold text-slate-300">SAR / Tahun</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">Setara ~ Rp 415.000 / tahun</p>
+                    </div>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-4 mb-8 text-xs text-slate-300">
+                    <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Penyimpanan Aman Dokumen Kontrak & Iqama</span></div>
+                    <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Monitoring Masa Berlaku Iqama & Asuransi</span></div>
+                    <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Pencatatan Cuti Cuti Tahunan Lengkap</span></div>
+                    <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Konsultasi Kasus Ditinjau Advokat Lisensi Saudi</span></div>
+                    <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Terjemahan Otomatis 3 Bahasa (ID, AR, EN)</span></div>
+                    <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>Kalkulasi Hak End of Service (Pesangon)</span></div>
+                </div>
+
+                <a href="register.html" class="block w-full py-4 text-center font-bold bg-gradient-to-r from-gold-500 to-amber-600 text-navy-900 rounded-xl shadow-lg hover:brightness-110 transition text-sm">Daftar Keanggotaan Sekarang</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- PREMIUM POPUP MODAL: END OF SERVICE CALCULATOR -->
+    <div id="calcModal" class="fixed inset-0 z-50 hidden modal-blur flex items-center justify-center p-4">
+        <div class="glass-card-light w-full max-w-lg rounded-3xl p-6 sm:p-8 text-slate-900 relative shadow-2xl animate-in fade-in zoom-in duration-200">
+            <button onclick="closeModal('calcModal')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-navy-900 text-gold-400 flex items-center justify-center">
+                    <i data-lucide="calculator" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-navy-900">Simulasi End of Service (حق مكافأة نهاية الخدمة)</h3>
+                    <p class="text-xs text-slate-500">Sesuai Pasal 84 & 85 Hukum Ketenagakerjaan Saudi</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold mb-1">Gaji Pokok + Tunjangan Tetap (SAR)</label>
+                    <input type="number" id="calcSalary" placeholder="Contoh: 3000" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-navy-900">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Masa Kerja (Tahun)</label>
+                    <input type="number" id="calcYears" placeholder="Contoh: 5" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-navy-900">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1">Alasan Berhenti Kerja</label>
+                    <select id="calcReason" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-navy-900 bg-white">
+                        <option value="END_CONTRACT">Finis Kontrak / PHK oleh Majikan</option>
+                        <option value="RESIGN">Mengundurkan Diri (Resign)</option>
+                    </select>
+                </div>
+                <button onclick="calculateEOS()" class="w-full py-3 bg-navy-900 text-gold-400 font-bold rounded-xl hover:bg-navy-800 transition">Hitung Estimasi Hak</button>
+
+                <div id="calcResult" class="hidden p-4 rounded-xl bg-slate-100 border border-slate-200 mt-4 text-center">
+                    <span class="text-[11px] text-slate-500 uppercase block font-semibold">Estimasi Hadiah Akhir Masa Kerja</span>
+                    <span id="eosAmount" class="text-2xl font-extrabold text-emerald-600 my-1 block">0 SAR</span>
+                    <p class="text-[10px] text-slate-400">Hasil ini adalah estimasi awal berdasarkan data input standar. Penilaian akhir memerlukan review pengacara resmi.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-navy-900 border-t border-white/10 pt-16 pb-12 px-6 text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+            <div class="space-y-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-gold-500 flex items-center justify-center font-bold text-navy-900 text-base">حق</div>
+                    <span class="text-base font-extrabold text-white">HAQ SAUDI</span>
+                </div>
+                <p class="leading-relaxed">Platform Perlindungan Hak Pekerja Migran Indonesia di Kerajaan Arab Saudi. Menghubungkan dokumentasi presisi dengan pengacara berlisensi.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4">Navigasi Utama</h4>
+                <ul class="space-y-2">
+                    <li><a href="#about" class="hover:text-gold-400">Tentang Platform</a></li>
+                    <li><a href="#pricing" class="hover:text-gold-400">Biaya Membership SAR 99</a></li>
+                    <li><a href="login.html" class="hover:text-gold-400">Portal Pengacara</a></li>
+                    <li><a href="login.html" class="hover:text-gold-400">Portal Admin</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4">Legal & Kerahasiaan</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-gold-400">Kebijakan Privasi Dokumen</a></li>
+                    <li><a href="#" class="hover:text-gold-400">Syarat & Ketentuan Layanan</a></li>
+                    <li><a href="#" class="hover:text-gold-400">Sanggahan Hukum (Disclaimer)</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4">Rekening Resmi Perusahaan</h4>
+                <p class="mb-2">Al Rajhi Bank: <span class="text-slate-200 font-mono">SA03800004820000123456789</span></p>
+                <p>Atas Nama: <span class="text-slate-200">HAQ SAUDI LEGAL TECH CO.</span></p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto border-t border-white/5 pt-6 text-center text-[11px] text-slate-500">
+            &copy; 2026 HAQ SAUDI Platform. All rights reserved. Supported by Judicial Graduates in Madinah & Saudi Licensed Advocates.
+        </div>
+    </footer>
+
+    <!-- INTERACTION & TRANSLATION SCRIPT -->
+    <script>
+        lucide.createIcons();
+
+        // Translation Dictionary Client Side
+        const translations = {
+            id: {
+                "nav.about": "Tentang Kami",
+                "nav.services": "Layanan",
+                "nav.pricing": "Keanggotaan",
+                "nav.faq": "FAQ",
+                "nav.login": "Masuk",
+                "nav.register": "Daftar Sekarang",
+                "hero.badge": "Platform Perlindungan Hukum Migran Resmi & Terpercaya",
+                "hero.title": "Kenali Hakmu. Simpan Buktimu. <br><span class='bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-emerald-400 to-gold-500'>Dapatkan Pendampingan Hukum Saudi.</span>",
+                "hero.subtitle": "Platform legal-tech khusus pekerja Indonesia di Arab Saudi. Didukung penuh oleh alumni magister hukum/syariah Madinah dan advokat lisensi resmi Kerajaan Arab Saudi.",
+                "hero.ctaPrimary": "Mulai Lindungi Hak Anda",
+                "hero.ctaSecondary": "Simulasi Hak End of Service"
+            },
+            ar: {
+                "nav.about": "من نحن",
+                "nav.services": "الخدمات",
+                "nav.pricing": "العضوية",
+                "nav.faq": "الأسئلة الشائعة",
+                "nav.login": "دخول",
+                "nav.register": "سجل الآن",
+                "hero.badge": "منصة حماية حقوق العمالة الموثوقة",
+                "hero.title": "اعرف حقوقك، واحفظ مستنداتك، <br><span class='bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-emerald-400 to-gold-500'>واحصل على التوجيه القانوني السعودي.</span>",
+                "hero.subtitle": "منصة تقنية قانونية مخصصة للعمالة الإندونيسية في المملكة. مدعومة بنخبة من خريجي الدراسات القضائية بالمدينة المنورة ومحامين سعوديين مرخصين.",
+                "hero.ctaPrimary": "ابدأ بحماية حقوقك",
+                "hero.ctaSecondary": "حساب مكافأة نهاية الخدمة"
+            },
+            en: {
+                "nav.about": "About Us",
+                "nav.services": "Services",
+                "nav.pricing": "Membership",
+                "nav.faq": "FAQ",
+                "nav.login": "Sign In",
+                "nav.register": "Register Now",
+                "hero.badge": "Trusted Migrant Rights Legal-Tech Platform",
+                "hero.title": "Know Your Rights. Protect Your Documents. <br><span class='bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-emerald-400 to-gold-500'>Get Saudi Legal Guidance.</span>",
+                "hero.subtitle": "Dedicated legal-tech platform for Indonesian workers in Saudi Arabia. Supported by judicial studies graduates in Madinah and licensed Saudi advocates.",
+                "hero.ctaPrimary": "Protect Your Rights Today",
+                "hero.ctaSecondary": "Calculate End of Service"
+            }
+        };
+
+        function changeLanguage(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function calculateEOS() {
+            const salary = parseFloat(document.getElementById('calcSalary').value) || 0;
+            const years = parseFloat(document.getElementById('calcYears').value) || 0;
+            const reason = document.getElementById('calcReason').value;
+
+            if (!salary || !years) return;
+
+            let total = 0;
+            // Saudi Labor Law Rules (Article 84)
+            if (years <= 5) {
+                total = (salary / 2) * years;
+            } else {
+                total = (salary / 2) * 5 + salary * (years - 5);
+            }
+
+            // Adjustment for Resignation (Article 85)
+            if (reason === 'RESIGN') {
+                if (years < 2) total = 0;
+                else if (years < 5) total = total * (1/3);
+                else if (years < 10) total = total * (2/3);
+            }
+
+            document.getElementById('eosAmount').innerText = Math.round(total).toLocaleString() + ' SAR';
+            document.getElementById('calcResult').classList.remove('hidden');
+        }
+    </script><!-- Script Konfigurasi & Interaktif -->
+    <script src="config.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // Mengambil data statistik umum dari Google Sheets saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', async () => {
+            const res = await callApi('getPublicStats');
+            if (res.success) {
+                console.log('Statistik berhasil dimuat:', res.data);
+            }
+        });
+    </script>
+</body>
+</html>
+</body>
+</html>

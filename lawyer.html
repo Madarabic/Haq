@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAQ SAUDI — بوابة المحامين / Lawyer Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 900: '#001A2C', 800: '#002B49', 700: '#003B63' },
+                        emerald: { 600: '#059669', 500: '#10B981' },
+                        gold: { 500: '#D4AF37', 400: '#F3E5AB' }
+                    },
+                    fontFamily: { sans: ['Cairo', 'Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .glass-card { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+    <!-- LAWYER HEADER -->
+    <header class="bg-navy-900 border-b border-white/10 px-6 py-4 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gold-500 text-navy-900 font-bold flex items-center justify-center text-lg">م</div>
+                <div>
+                    <h1 class="text-sm font-bold text-white">المحامي: سليمان الغامدي</h1>
+                    <p class="text-[10px] text-gold-400 font-mono">ترخيص وزارة العدل رقم: 41/928</p>
+                </div>
+            </div>
+            <a href="index.html" class="p-2 text-slate-400 hover:text-white"><i data-lucide="log-out" class="w-5 h-5"></i></a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 pt-8">
+        <!-- LAWYER STATS -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass-card rounded-2xl p-4 border-r-4 border-gold-500">
+                <span class="text-[10px] text-slate-400 uppercase block font-semibold">إجمالي الاستشارات</span>
+                <span class="text-xl font-extrabold text-white mt-1 block">24</span>
+            </div>
+            <div class="glass-card rounded-2xl p-4 border-r-4 border-amber-500">
+                <span class="text-[10px] text-slate-400 uppercase block font-semibold">قضايا بانتظار المراجعة</span>
+                <span class="text-xl font-extrabold text-amber-400 mt-1 block">3</span>
+            </div>
+            <div class="glass-card rounded-2xl p-4 border-r-4 border-emerald-500">
+                <span class="text-[10px] text-slate-400 uppercase block font-semibold">استشارات مكتملة</span>
+                <span class="text-xl font-extrabold text-emerald-400 mt-1 block">21</span>
+            </div>
+            <div class="glass-card rounded-2xl p-4 border-r-4 border-red-500">
+                <span class="text-[10px] text-slate-400 uppercase block font-semibold">حالات عاجلة</span>
+                <span class="text-xl font-extrabold text-red-400 mt-1 block">1</span>
+            </div>
+        </div>
+
+        <!-- CASES REVIEW TABLE -->
+        <div class="glass-card rounded-3xl p-6 border border-white/10">
+            <h2 class="text-base font-bold text-white mb-6 flex items-center gap-2">
+                <i data-lucide="file-text" class="w-5 h-5 text-gold-400"></i>
+                الاستشارات القانونية المحالة إليك
+            </h2>
+
+            <div class="space-y-6">
+                <!-- CASE REVIEW ITEM WITH AUTOMATIC TRANSLATION ENGINE -->
+                <div class="p-6 rounded-2xl bg-navy-900 border border-white/10 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">بانتظار المراجعة</span>
+                            <h3 class="font-bold text-white text-sm mt-2">تأخر صرف الرواتب لمدة شهرين (العميل: أحمد سوباجيو)</h3>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-400">CASE-8921</span>
+                    </div>
+
+                    <!-- ORIGINAL INDONESIAN TEXT & AUTO ARABIC TRANSLATION -->
+                    <div class="grid md:grid-cols-2 gap-4 text-xs">
+                        <div class="p-4 rounded-xl bg-navy-800/50 border border-white/5">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">نص السؤال الأصلي (Bahasa Indonesia):</span>
+                            <p class="text-slate-300">Gaji bulan Juli dan Agustus belum ditransfer ke rekening. Majikan menjanjikan minggu depan namun tidak ada kejelasan...</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-gold-500/5 border border-gold-500/20">
+                            <span class="text-[10px] font-bold text-gold-400 uppercase block mb-1">الترجمة الآلية الفورية للغة العربية:</span>
+                            <p class="text-slate-200">لم يتم تحويل رواتب شهري يوليو وأغسطس إلى الحساب البنكي. الكفيل يعد بأسبوع قادم ولكن لا يوجد توضيح محدد...</p>
+                        </div>
+                    </div>
+
+                    <!-- LEGAL ANSWER DRAFTING BOX -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-2">صياغة الإرشاد النظامي (باللغة العربية - سيتم ترجمته آلياً للعمالة):</label>
+                        <textarea id="answerInput" rows="3" class="w-full p-4 rounded-xl bg-navy-800 border border-white/10 text-white text-xs outline-none focus:border-gold-500" placeholder="استناداً إلى المادة 90 من نظام العمل السعودي..."></textarea>
+                    </div>
+
+                    <div class="flex justify-end gap-3">
+                        <!-- Menambahkan fungsi onclick agar dapat memanggil submitAnswer -->
+                        <button onclick="submitAnswer('CASE-8921')" class="px-5 py-2.5 bg-emerald-600 text-white font-bold rounded-xl text-xs hover:bg-emerald-500 transition">اعتماد وإرسال للإندونيسية</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Script Konfigurasi & Interaktif -->
+    <script src="config.js"></script>
+    <script>
+        lucide.createIcons();
+
+        async function submitAnswer(caseId) {
+            const arabicAnswer = document.getElementById('answerInput').value;
+
+            if (!arabicAnswer.trim()) {
+                alert('الرجاء كتابة الإرشاد النظامي قبل الإرسال');
+                return;
+            }
+
+            const res = await callApi('submitLegalAnswer', {
+                caseId: caseId,
+                answerArabic: arabicAnswer
+            });
+
+            if (res.success) {
+                alert('تم اعتماد الإجابة القانونية وترجمتها للغة الإندونيسية بنجاح!');
+                location.reload();
+            } else {
+                alert('فشل حفظ الإجابة: ' + (res.error?.message || 'حدث خطأ في النظام'));
+            }
+        }
+    </script>
+</body>
+</html>
