@@ -42,8 +42,8 @@
         <div class="glass-card rounded-3xl p-8 shadow-2xl relative">
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Email / البريد الإلكتروني</label>
-                    <input type="email" id="loginEmail" required placeholder="nama@email.com" class="w-full px-4 py-3 rounded-xl bg-navy-800/80 border border-white/10 text-white text-xs focus:outline-none focus:border-gold-500 transition">
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Email / No. HP / ID User</label>
+                    <input type="text" id="loginEmail" required placeholder="nama@email.com / 9665x / USR-x" class="w-full px-4 py-3 rounded-xl bg-navy-800/80 border border-white/10 text-white text-xs focus:outline-none focus:border-gold-500 transition">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Kata Sandi / كلمة المرور</label>
@@ -69,38 +69,32 @@
         <p class="text-center text-xs text-slate-500 mt-6">Belum punya akun? <a href="register.html" class="text-gold-400 hover:underline">Daftar Pekerja Baru</a></p>
     </div>
 
-    <script>
-        function demoLogin(role) {
-            if (role === 'worker') window.location.href = 'worker.html';
-            if (role === 'lawyer') window.location.href = 'lawyer.html';
-            if (role === 'admin') window.location.href = 'admin.html';
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            if (email.includes('lawyer')) window.location.href = 'lawyer.html';
-            else if (email.includes('admin')) window.location.href = 'admin.html';
-            else window.location.href = 'worker.html';
-        }
-    </script><!-- Script Konfigurasi & Interaktif -->
+    <!-- Script Konfigurasi & Interaktif -->
     <script src="config.js"></script>
     <script>
         lucide.createIcons();
 
         async function handleLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
+            const identifier = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
-            // Memanggil API login di Code.gs
-            const res = await callApi('loginUser', { email, password });
+            // Memanggil API loginUser di Code.gs lewat config.js
+            const res = await callApi('loginUser', { 
+                identifier: identifier,
+                email: identifier, 
+                password: password 
+            });
 
             if (res.success) {
-                // Arahkan sesuai role dari database
-                if (res.data.role === 'ADMIN') window.location.href = 'admin.html';
-                else if (res.data.role === 'LAWYER') window.location.href = 'lawyer.html';
-                else window.location.href = 'worker.html';
+                const role = (res.data.role || '').toUpperCase();
+                if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
+                    window.location.href = 'admin.html';
+                } else if (role === 'LAWYER') {
+                    window.location.href = 'lawyer.html';
+                } else {
+                    window.location.href = 'worker.html';
+                }
             } else {
                 alert('Login Gagal: ' + (res.error?.message || 'Email/Password salah'));
             }
@@ -112,7 +106,5 @@
             if (role === 'admin') window.location.href = 'admin.html';
         }
     </script>
-</body>
-</html>
 </body>
 </html>
